@@ -1,0 +1,20 @@
+#All paths and files in this document should be relative to working_directory.
+working_directory = './'
+
+#If true all preexisting outputs will be overwritten.
+overwrite = true
+
+#Directory to save outputs. Will be created if not extant.
+output_directory = 'test_output'
+
+#Set the amount of information to be displayed in the console.
+#10 shows the most information 50 silences logging display. 
+#All logs will be saved to MSDpostprocess.log regardless of this setting.
+log_level = 50
+
+#The file for all logs to be written to. 
+#This is in addition to the console logging
+log_file = '/dev/null'
+
+#The number of cores to use for fitting. 0 will use all available cores.
+cores = 0
