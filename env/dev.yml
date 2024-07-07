@@ -1,0 +1,15 @@
+channels:
+- defaults
+- conda-forge
+- bioconda
+dependencies:
+- python==3.11.9
+- pip
+- numpy
+- dill
+- matplotlib
+- pandas
+- scipy
+- sortedcontainers
+- spyder
+- statsmodels
