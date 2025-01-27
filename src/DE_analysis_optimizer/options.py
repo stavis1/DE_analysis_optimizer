@@ -13,14 +13,13 @@ import sys
 class InputError(Exception):
     pass
 
-class options:
+class Options:
     def __init__(self):
         self.parse_args()
         self.handle_working_directory()
         self.logger_init()
         self.validate_inputs()        
         self.find_data()
-        self.parse_design()
         if self.cores < 1:
             self.cores = os.cpu_count()
     
