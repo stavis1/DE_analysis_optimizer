@@ -18,3 +18,11 @@ log_file = 'test.log'
 
 #The number of cores to use for fitting. 0 will use all available cores.
 cores = 0
+
+#The tab separated text file containing raw analyte quantities in an analyte X sample matrix
+data_file = 'data.tsv'
+
+#A list of lists defining which pipeline steps are to be used for this optimization run
+step_options = [[],
+		[],
+		[]]

@@ -35,7 +35,9 @@ class optionsTestSuite(unittest.TestCase):
                     'overwrite',
                     'log_file',
                     'log_level',
-                    'cores']
+                    'cores',
+                    'data_file',
+                    'step_options']
         for attr in required:
             tmp = self.options.__dict__[attr]
             del self.options.__dict__[attr]

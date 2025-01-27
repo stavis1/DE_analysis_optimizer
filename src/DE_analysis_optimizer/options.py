@@ -19,7 +19,6 @@ class Options:
         self.handle_working_directory()
         self.logger_init()
         self.validate_inputs()        
-        self.find_data()
         if self.cores < 1:
             self.cores = os.cpu_count()
     
@@ -74,15 +73,18 @@ class Options:
                     'overwrite',
                     'log_file',
                     'log_level',
-                    'cores']
+                    'cores',
+                    'data_file',
+                    'step_options']
         problems = [r for r in required if not r in self.__dict__.keys()]
         if problems:
             msg = 'Required settings not found in options file:\n' + '\n'.join(problems)
             self.logs.error(msg)
             raise InputError()
-
-    def find_data(self):
-        pass
+        if not os.path.exists(self.data_file):
+            msg = 'The specified data file could not be found.'
+            self.logs.error(msg)
+            raise InputError()
 
     def print_options(self, path):
         import shutil
