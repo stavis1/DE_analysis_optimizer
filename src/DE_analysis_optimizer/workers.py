@@ -1,0 +1,86 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Jan 27 13:36:06 2025
+
+@author: 4vt
+"""
+
+class Message:
+    def __init__(self, purpose, value):
+        self.purpose = purpose
+        self.value = value
+
+def run_optimization_worker(options, initial_data, pipe):
+    '''
+    There will be one worker process run per core.
+    Each will live for the lifetime of the program.
+    Each will run an infinite loop of optimization steps. 
+    '''
+    from copy import deepcopy
+    
+    outcomes = []
+    attempts = set()
+    while True:
+        #read outcomes
+        pipe.send(Message('get_outcomes', len(outcomes)))
+        outcomes.extend(pipe.recv())
+        
+        #read attempted pipelines
+        pipe.send(Message('get_attempts', len(attempts)))
+        attempts.update(pipe.recv())
+        
+        #generate new pipeline
+        
+        #write current pipeline to attempted pipelines table
+        
+        #set up new working data
+        data = deepcopy(initial_data)
+
+        #run the pipeline
+        
+        #assess results
+        
+        #write outcomes
+
+def run_data_manager(options, pipes):
+    '''
+    Receives and stores attempted runs.
+    Provides lists of attempted runs upon request.
+    Receives, stores, and writes to file outcomes.
+    Provides lists of outcomes upon request.
+    '''
+    import os
+
+    #initialize the outcomes file
+    steps = sorted(list(options.step_options.keys()))
+    outcomes = [f'{col}_{metric}' for col in options.ground_truths for metric in ('recall', 'FDR')]
+    outcomes_file = os.path.join(options.output_directory, 'outcomes.tsv')
+    with open(outcomes_file, 'w') as tsv:
+        tsv.write('\t'.join(steps + outcomes) + '\n')
+        
+    #monitor pipes
+    attempts = []
+    outcomes = []
+    while True:
+        for pipe in pipes:
+            if pipe.poll():
+                message = pipe.recv()
+                
+                #handle attempts
+                if message.purpose == 'get_attempts':
+                    pipe.send(attempts[message.value:])
+                elif message.purpose == 'submit_attempt':
+                    attempts.append(message.value)
+                
+                #handle outcomes
+                elif message.purpose == 'get_outcomes':
+                    pipe.send(outcomes[message.value:])
+                elif message.purpose == 'submit_outcome':
+                    outcomes.append(message.value)
+                    with open(outcomes_file, 'a') as tsv:
+                        tsv.write('\t'.join(message.value) + '\n')
+
+
+
+

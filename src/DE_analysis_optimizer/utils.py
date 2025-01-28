@@ -6,18 +6,20 @@ Created on Mon Jan 27 14:20:40 2025
 @author: 4vt
 """
 
-def init_files(options):
-    '''
-    Generates the attempted and results files with the headers appropriate to the optimization run.
-    '''
-    import os
-
-    steps = sorted(list(options.step_options.keys()))
-    outcomes = [f'{col}_{metric}' for col in options.ground_truths for metric in ('recall', 'FDR')]
-    with open('attempted.tsv', 'w') as tsv:
-        tsv.write('\t'.join(steps) + '\n')
-    with open(os.path.join(options.output_directory, 'outcomes.tsv'), 'w') as tsv:
-        tsv.write('\t'.join(steps + outcomes) + '\n')
+def init_data_manager(options, pool):
+    from multiprocessing import Pipe
+    from DE_analysis_optimizer.workers import run_data_manager
+    
+    #initialize attempts manager
+    manager_ends = []
+    optimizer_ends = []
+    for _ in range(options.cores - 1):
+        manager_end, optimizer_end = Pipe()
+        manager_ends.append(manager_end)
+        optimizer_ends.append(optimizer_end)
+    pool.starmap_async(run_data_manager, ((options, manager_ends),))
+    
+    return optimizer_ends
 
 def read_data(options):
     '''
