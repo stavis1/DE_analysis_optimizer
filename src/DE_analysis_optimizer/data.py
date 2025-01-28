@@ -18,6 +18,9 @@ class Data:
     def __hash__(self):
         return hash(self.history)
     
+    def __eq__(self, o):
+        return hash(self.history) == hash(o)
+    
     def get_A(self):
         return self.data[self.A_cols]
 
