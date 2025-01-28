@@ -12,6 +12,7 @@ class Step():
 
     def process(self, data):
         data.history += self.name
+        return data
 
 
 class Noop(Step):
@@ -19,4 +20,5 @@ class Noop(Step):
         self.name = 'noop'
     
     def process(self, data):
+        data = super().process(data)
         return data

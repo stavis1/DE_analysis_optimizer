@@ -30,8 +30,11 @@ class dataTestSuite(testSuite_ancestor_objs.baseTestSuite):
         with self.subTest('Test get_truths()'):
             self.assertEqual((100, 2), self.data.get_truths().shape)    
 
-        with self.subTest('Test get_results()'):
-            self.assertEqual((100,), self.data.get_results().shape)    
+        with self.subTest('Test get_significance()'):
+            self.assertEqual((100,), self.data.get_significance().shape)    
+
+        with self.subTest('Test get_score()'):
+            self.assertEqual((100,), self.data.get_score().shape)    
 
     def test_setters_work(self):
         ones_100x3 = np.full((100,3), 1)
@@ -49,13 +52,22 @@ class dataTestSuite(testSuite_ancestor_objs.baseTestSuite):
             self.assertEqual(newsum, 100*3)
             self.assertNotEqual(B_init, newsum)
         
-        with self.subTest('Test set_results()'):
-            results_init = np.sum(self.data.get_results())
+        with self.subTest('Test set_significance()'):
+            results_init = np.sum(self.data.get_significance())
             rng = np.random.default_rng(1)
             newresults = rng.choice((True, False), 100)
-            self.data.set_results(newresults)
-            newsum = np.sum(self.data.get_results().to_numpy())
+            self.data.set_significance(newresults)
+            newsum = np.sum(self.data.get_significance().to_numpy())
             self.assertEqual(newsum, np.sum(newresults))
+            self.assertNotEqual(results_init, newsum)
+            
+        with self.subTest('Test set_score()'):
+            results_init = np.sum(np.isfinite(self.data.get_score()))
+            rng = np.random.default_rng(1)
+            newresults = rng.uniform(0, 1, 100)
+            self.data.set_score(newresults)
+            newsum = np.sum(np.isfinite(self.data.get_score()))
+            self.assertEqual(newsum, np.sum(np.isfinite(newresults)))
             self.assertNotEqual(results_init, newsum)
             
     

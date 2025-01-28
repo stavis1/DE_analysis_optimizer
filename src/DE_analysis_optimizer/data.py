@@ -6,6 +6,8 @@ Created on Mon Jan 27 15:10:36 2025
 @author: 4vt
 """
 
+import numpy as np
+
 class Data:
     def __init__(self, options, df):
         self.history = ''
@@ -13,7 +15,8 @@ class Data:
         self.B_cols = list(options.B)
         self.ground_truths = list(options.ground_truths)
         self.data = df
-        self.data['result'] = [True]*df.shape[0]
+        self.data['prob_score'] = [np.nan]*df.shape[0]
+        self.data['is_significant'] = [True]*df.shape[0]
     
     def __hash__(self):
         return hash(self.history)
@@ -45,11 +48,17 @@ class Data:
     def get_truths(self):
         return self.data[self.ground_truths]
     
-    def get_results(self):
-        return self.data['result']
+    def get_significance(self):
+        return self.data['is_significant']
 
-    def set_results(self, results):
-        self.data['result'] = results
+    def set_significance(self, results):
+        self.data['is_significant'] = results
+
+    def get_score(self):
+        return self.data['prob_score']
+
+    def set_score(self, results):
+        self.data['prob_score'] = results
 
 
 

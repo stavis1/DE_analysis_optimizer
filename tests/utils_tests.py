@@ -15,15 +15,22 @@ import testSuite_ancestor_objs
 from DE_analysis_optimizer.utils import init_files, read_data, get_outcomes, get_attempts
 
 class utilsTestSuite(testSuite_ancestor_objs.baseTestSuite):
+    def delete(self, path):
+        if os.path.exists(path):
+            if os.path.isfile(path):
+                os.remove(path)
+            else:
+                rmtree(path, ignore_errors=True)
+    
     def setUp(self):
         super().setUp()
-        rmtree('attempted.tsv', ignore_errors=True)
-        rmtree('test_output/outcomes.tsv', ignore_errors=True)
+        self.delete('attempted.tsv')
+        self.delete('test_output/outcomes.tsv')
     
     def tearDown(self):
         super().tearDown()
-        rmtree('attempted.tsv', ignore_errors=True)
-        rmtree('test_output', ignore_errors=True)
+        self.delete('attempted.tsv')
+        self.delete('test_output')
     
     def test_file_initialization(self):
         init_files(self.options)
