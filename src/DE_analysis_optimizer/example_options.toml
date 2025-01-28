@@ -7,22 +7,29 @@ overwrite = false
 #Directory to save outputs. Will be created if not extant.
 output_directory = 'example_output'
 
-#Set the amount of information to be displayed in the console.
-#10 shows the most information 50 silences logging display. 
-#All logs will be saved to MSDpostprocess.log regardless of this setting.
-log_level = 10
-
-#The file for all logs to be written to. 
-#This is in addition to the console logging
-log_file = 'test.log'
-
 #The number of cores to use for fitting. 0 will use all available cores.
 cores = 0
 
 #The tab separated text file containing raw analyte quantities in an analyte X sample matrix
 data_file = 'data.tsv'
 
-#A list of lists defining which pipeline steps are to be used for this optimization run
-step_options = [[],
-		[],
-		[]]
+#A list of column names in the data file for condition A
+A = []
+
+#A list of column names in the data file for condition B
+B = []
+
+#A list of column names in the data file for ground-truths. The first listed column will be the optimization target.
+ground_truths = []
+
+#A table of lists defining which pipeline steps are to be used for this optimization run.
+#Each list contains the options for that step in the pipeline.
+#Each list can be named whatever you want but should start with the order number.
+[step_options]
+1_protein_rollup = ['noop']
+2_normalization = ['noop']
+3_statistical_test = ['noop']
+4_multiplicity_correction = ['noop']
+5_effect_size_filter = ['noop']
+6_rules_based_filter = ['noop']
+

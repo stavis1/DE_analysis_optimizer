@@ -7,12 +7,10 @@ Created on Sun Jul  7 17:33:28 2024
 """
 
 import sys
-from shutil import rmtree
 import os
 import unittest
-import logging
 
-from DE_analysis_optimizer.options import options, setup_workspace
+from DE_analysis_optimizer.options import Options
 
 class baseTestSuite(unittest.TestCase):
     def setUp(self):
@@ -20,10 +18,7 @@ class baseTestSuite(unittest.TestCase):
         self.init_argv = sys.argv
         test_path = os.path.dirname(__name__)
         sys.argv = [sys.argv[0], '--options', os.path.join(test_path, 'test_options.toml')]
-        self.args = options()
-        logger = logging.getLogger('DE_analysis_optimizer')
-        logger.setLevel(logging.FATAL)
-        os.chdir(self.args.working_directory)
+        self.options = Options()
         pass
     
     def tearDown(self):

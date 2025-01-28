@@ -10,8 +10,60 @@ def init_files(options):
     '''
     Generates the attempted and results files with the headers appropriate to the optimization run.
     '''
-    pass
+    import os
 
+    steps = sorted(list(options.step_options.keys()))
+    outcomes = [f'{col}_{metric}' for col in options.ground_truths for metric in ('recall', 'FDR')]
+    with open('attempted.tsv', 'w') as tsv:
+        tsv.write('\t'.join(steps) + '\n')
+    with open(os.path.join(options.output_directory, 'outcomes.tsv'), 'w') as tsv:
+        tsv.write('\t'.join(steps + outcomes) + '\n')
 
+def read_data(options):
+    '''
+    Reads in the raw analyte quantities file.
+    '''
+    import pandas as pd    
+    from DE_analysis_optimizer.data import Data
+    
+    df = pd.read_csv(options.data_file, sep = '\t')
+    data = Data(options, df)
+    return data
+
+class Outcome:
+    def __init__(self, steps, recall, FDR):
+        self.recall = recall
+        self.FDR = FDR
+        self.steps = steps[1].to_dict()
+        self.hash = hash(''.join(steps[1].values))
+    
+    def __hash__(self):
+        return self.hash
+    
+    def __eq__(self, o):
+        return self.hash == hash(o)
+
+def get_outcomes(options):
+    '''
+    Constructs a list of Outcome objects which hold the settings and performance metrics which are the targets of optimization.
+    '''
+    import os
+    import pandas as pd
+    
+    data = pd.read_csv(os.path.join(options.output_directory, 'outcomes.tsv'), sep = '\t')
+    steps = data[sorted(list(options.step_options.keys()))].iterrows()
+    truth = options.ground_truths[0]    
+    outcomes = [Outcome(step, recall, FDR) for step, recall, FDR in zip(steps, data[f'{truth}_recall'], data[f'{truth}_FDR'])]
+    return outcomes
+
+def get_attempts(options):
+    '''
+    Constructs a set of paramteter combinations for initiated attempts.
+    '''
+    import pandas as pd
+
+    data = pd.read_csv('attempted.tsv', sep = '\t')
+    attempts = set(''.join(attempt) for attempt in zip(*[data[c] for c in data.columns]))
+    return attempts
 
 
