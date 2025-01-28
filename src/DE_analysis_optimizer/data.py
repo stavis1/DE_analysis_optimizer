@@ -25,19 +25,19 @@ class Data:
         return hash(self.history) == hash(o)
     
     def get_A(self):
-        return self.data[self.A_cols]
+        return self.data[self.A_cols].to_numpy()
 
     def set_A(self, data):
         self.data[self.A_cols] = data
 
     def get_B(self):
-        return self.data[self.B_cols]
+        return self.data[self.B_cols].to_numpy()
 
     def set_B(self, data):
         self.data[self.B_cols] = data
     
     def get_data(self):
-        return self.data[self.A_cols + self.B_cols]
+        return self.data[self.A_cols + self.B_cols].to_numpy()
     
     def set_data(self, data):
         self.data[self.A_cols + self.B_cols] = data
@@ -46,16 +46,16 @@ class Data:
         self.data = self.data[to_keep]
 
     def get_truths(self):
-        return self.data[self.ground_truths]
+        return self.data[self.ground_truths].to_numpy()
     
     def get_significance(self):
-        return self.data['is_significant']
+        return self.data['is_significant'].to_numpy()
 
     def set_significance(self, results):
         self.data['is_significant'] = results
 
     def get_score(self):
-        return self.data['prob_score']
+        return self.data['prob_score'].to_numpy()
 
     def set_score(self, results):
         self.data['prob_score'] = results

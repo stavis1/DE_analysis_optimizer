@@ -18,6 +18,7 @@ def run_optimization_worker(options, initial_data, pipe):
     Each will run an infinite loop of optimization steps. 
     '''
     from copy import deepcopy
+    from DE_analysis_optimizer.pipeline import Pipeline
     
     outcomes = []
     attempts = set()
@@ -31,17 +32,22 @@ def run_optimization_worker(options, initial_data, pipe):
         attempts.update(pipe.recv())
         
         #generate new pipeline
+        pipeline = Pipeline(options)
+        #TODO: genetic algorithm
         
         #write current pipeline to attempted pipelines table
+        attempt = pipeline.attempt_line()
+        pipe.send(Message('submit_attempt', attempt))
         
         #set up new working data
         data = deepcopy(initial_data)
 
         #run the pipeline
-        
-        #assess results
+        pipeline.run(data)
         
         #write outcomes
+        outcome = pipeline.report()
+        pipe.send(Message('submit_outcome', outcome))
 
 def run_data_manager(options, pipes):
     '''
