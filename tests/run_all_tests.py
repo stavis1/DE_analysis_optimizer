@@ -10,6 +10,7 @@ import unittest
 from options_tests import *
 from utils_tests import *
 from data_tests import *
+from pipeline_tests import *
 
 if __name__ == '__main__':
     unittest.main()

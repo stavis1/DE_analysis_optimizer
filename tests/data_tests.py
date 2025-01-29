@@ -39,16 +39,16 @@ class dataTestSuite(testSuite_ancestor_objs.baseTestSuite):
     def test_setters_work(self):
         ones_100x3 = np.full((100,3), 1)
         with self.subTest('Test set_A()'):
-            A_init = np.sum(self.data.get_A().to_numpy())
+            A_init = np.sum(self.data.get_A())
             self.data.set_A(ones_100x3)
-            newsum = np.sum(self.data.get_A().to_numpy())
+            newsum = np.sum(self.data.get_A())
             self.assertEqual(newsum, 100*3)
             self.assertNotEqual(A_init, newsum)
 
         with self.subTest('Test set_B()'):
-            B_init = np.sum(self.data.get_B().to_numpy())
+            B_init = np.sum(self.data.get_B())
             self.data.set_B(ones_100x3)
-            newsum = np.sum(self.data.get_B().to_numpy())
+            newsum = np.sum(self.data.get_B())
             self.assertEqual(newsum, 100*3)
             self.assertNotEqual(B_init, newsum)
         
@@ -57,7 +57,7 @@ class dataTestSuite(testSuite_ancestor_objs.baseTestSuite):
             rng = np.random.default_rng(1)
             newresults = rng.choice((True, False), 100)
             self.data.set_significance(newresults)
-            newsum = np.sum(self.data.get_significance().to_numpy())
+            newsum = np.sum(self.data.get_significance())
             self.assertEqual(newsum, np.sum(newresults))
             self.assertNotEqual(results_init, newsum)
             
