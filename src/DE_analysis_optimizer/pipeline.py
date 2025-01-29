@@ -7,6 +7,23 @@ Created on Tue Jan 28 17:53:15 2025
 """
 import numpy as np
 
+class Outcome:
+    def __init__(self, steps, results):
+        self.steps = steps
+        self.results = results
+        self.recall = results[0]
+        self.PPV = results[1]
+        self.hash = hash((*self.steps, self.PPV, self.recall))
+        
+    def __hash__(self):
+        return self.hash
+    
+    def __eq__(self, o):
+        return self.hash == hash(o)
+
+    def report(self):
+        return list(self.steps) + list(self.results)
+
 class Pipeline:
     def __init__(self, options):
         self.step_order = sorted(list(options.step_options.keys()))
@@ -30,17 +47,17 @@ class Pipeline:
         tp = np.nansum(np.logical_and(significant[:,np.newaxis], truths), axis = 0)
         fp = np.nansum(np.logical_and(significant[:,np.newaxis], np.logical_not(truths)), axis = 0)
         fn = np.nansum(np.logical_and(np.logical_not(significant)[:,np.newaxis], truths), axis = 0)
-        FDRs = fp/(fp+tp)
+        PPVs = fp/(fp+tp)
         recalls = fn/(fn+tp)
-        for FDR, recall in zip(FDRs, recalls):
+        for PPV, recall in zip(PPVs, recalls):
             self.results.append(recall)
-            self.results.append(FDR)
+            self.results.append(PPV)
     
     def attempt_line(self):
         return ''.join([self.steps[step].name for step in self.step_order])
     
     def report(self):
-        return [self.steps[step].name for step in self.step_order] + self.results
+        return Outcome([self.steps[step].name for step in self.step_order], self.results)
 
 
 

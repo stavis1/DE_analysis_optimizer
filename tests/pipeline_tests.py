@@ -44,7 +44,7 @@ class pipelineTestSuite(testSuite_ancestor_objs.baseTestSuite):
         scores_init = data.get_score()
         significant_init = data.get_significance()
         pipeline.run(data)
-        results = pipeline.report()
+        results = pipeline.report().report()
         
         with self.subTest('Did the scores change?'):
             self.assertNotEqual(np.sum(data.get_score()), np.sum(scores_init))

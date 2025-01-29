@@ -13,10 +13,13 @@ from multiprocessing import Pool
 import testSuite_ancestor_objs
 from DE_analysis_optimizer.utils import read_data, init_data_manager
 from DE_analysis_optimizer.workers import Message
+from DE_analysis_optimizer.pipeline import Outcome
 
 def writer(pipe):
-    pipe.send(Message('submit_attempt', ['test', 'attempt']))
-    pipe.send(Message('submit_outcome', ['test', 'outcome']))
+    pipe.send(Message('submit_attempt', 'testattempt'))
+    
+    outcome = Outcome(['test'], [0.1, 0.2])
+    pipe.send(Message('submit_outcome', outcome))
     return None
 
 def reader(pipe):
@@ -51,13 +54,13 @@ class utilsTestSuite(testSuite_ancestor_objs.baseTestSuite):
             p.terminate()
     
         with self.subTest('Is the attempt message correct?'):
-            self.assertEqual(attempt, [['test', 'attempt']])
+            self.assertEqual(attempt, ['testattempt'])
         with self.subTest('Is the outcome message correct?'):
-            self.assertEqual(outcome, [['test', 'outcome']])
+            self.assertEqual(outcome[0].report(), ['test', 0.1, 0.2])
         with self.subTest('Was the outcome message saved to file?'):
             with open('test_output/outcomes.tsv', 'r') as tsv:
                 text = tsv.readlines()[1]
-                self.assertEqual(text, 'test\toutcome\n')
+                self.assertEqual(text, 'test\t0.1\t0.2\n')
         
         self.delete('test_output/')
     

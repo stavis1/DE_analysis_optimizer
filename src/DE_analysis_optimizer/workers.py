@@ -18,7 +18,16 @@ def run_optimization_worker(options, initial_data, pipe):
     Each will run an infinite loop of optimization steps. 
     '''
     from copy import deepcopy
-    from DE_analysis_optimizer.pipeline import Pipeline
+    from DE_analysis_optimizer.genetic_algorithm import get_breeding_population, breed, mutate
+    from DE_analysis_optimizer import pipeline_steps
+
+    #set up a dictionary that maps pipeline step names to their objects
+    all_pipeline_steps = {}
+    for Step in pipeline_steps.__dict__.values():
+        if type(Step) == type:
+            step = Step()
+            if hasattr(step, 'name') and type(step.name) == str:
+                all_pipeline_steps[step.name] = step
     
     outcomes = []
     attempts = set()
@@ -27,13 +36,16 @@ def run_optimization_worker(options, initial_data, pipe):
         pipe.send(Message('get_outcomes', len(outcomes)))
         outcomes.extend(pipe.recv())
         
+        #generate new pipeline
+        outcomes = get_breeding_population(outcomes)
+        pipeline = breed(options, outcomes, all_pipeline_steps)
+        
         #read attempted pipelines
         pipe.send(Message('get_attempts', len(attempts)))
         attempts.update(pipe.recv())
         
-        #generate new pipeline
-        pipeline = Pipeline(options)
-        #TODO: genetic algorithm
+        #ensure the new pipeline is unique
+        pipeline = mutate(options, pipeline, attempts, all_pipeline_steps)
         
         #write current pipeline to attempted pipelines table
         attempt = pipeline.attempt_line()
@@ -60,7 +72,7 @@ def run_data_manager(options, pipes):
 
     #initialize the outcomes file
     steps = sorted(list(options.step_options.keys()))
-    outcomes = [f'{col}_{metric}' for col in options.ground_truths for metric in ('recall', 'FDR')]
+    outcomes = [f'{col}_{metric}' for col in options.ground_truths for metric in ('recall', 'PPV')]
     outcomes_file = os.path.join(options.output_directory, 'outcomes.tsv')
     with open(outcomes_file, 'w') as tsv:
         tsv.write('\t'.join(steps + outcomes) + '\n')
@@ -85,7 +97,7 @@ def run_data_manager(options, pipes):
                 elif message.purpose == 'submit_outcome':
                     outcomes.append(message.value)
                     with open(outcomes_file, 'a') as tsv:
-                        tsv.write('\t'.join(message.value) + '\n')
+                        tsv.write('\t'.join(str(e) for e in message.value.report()) + '\n')
 
 
 
