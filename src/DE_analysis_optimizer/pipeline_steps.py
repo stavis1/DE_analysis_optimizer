@@ -6,6 +6,9 @@ Created on Mon Jan 27 14:55:47 2025
 @author: 4vt
 """
 
+from pandas import pd
+import numpy as np
+
 class Step():
     def __init__(self):
         self.name = NotImplemented
@@ -59,7 +62,6 @@ class AllSummedAbundance(BaseSummedAbundance):
     
     def process(self, data):
         from copy import copy
-        from pandas import pd
         
         data = super().process(data)
         df = data.get_df()
@@ -80,6 +82,80 @@ class AllSummedAbundance(BaseSummedAbundance):
 # =============================================================================
 # normalization choices
 # =============================================================================
+
+class MeanCenter(Step):
+    def __init__(self):
+        self.name = 'mean_centering'
+    
+    def process(self, data):
+        data = super().process(data)
+        vals = data.get_data()
+        means = np.nanmean(vals, axis = 0)
+        grand_mean = np.nanmean(vals)
+        vals = (vals/means[:, np.newaxis])*grand_mean
+        data.set_data(vals)
+        return data
+
+class LogMeanCenter(Step):
+    def __init__(self):
+        self.name = 'log_mean_centering'
+    
+    def process(self, data):
+        data = super().process(data)
+        vals = data.get_data()
+        vals = np.log(vals)
+        means = np.nanmean(vals, axis = 0)
+        grand_mean = np.nanmean(vals)
+        vals = (vals/means[:, np.newaxis])*grand_mean
+        vals = np.exp(vals)
+        data.set_data(vals)
+        return data
+
+class MedianCenter(Step):
+    def __init__(self):
+        self.name = 'median_centering'
+    
+    def process(self, data):
+        data = super().process(data)
+        vals = data.get_data()
+        medians = np.nanmean(vals, axis = 0)
+        grand_median = np.nanmedian(vals)
+        vals = (vals/medians[:, np.newaxis])*grand_median
+        data.set_data(vals)
+        return data
+
+class LogMedianCenter(Step):
+    def __init__(self):
+        self.name = 'log_median_centering'
+    
+    def process(self, data):
+        data = super().process(data)
+        vals = data.get_data()
+        vals = np.log(vals)
+        medians = np.nanmean(vals, axis = 0)
+        grand_median = np.nanmedian(vals)
+        vals = (vals/medians[:, np.newaxis])*grand_median
+        vals = np.exp(vals)
+        data.set_data(vals)
+        return data
+
+class QuantileNorm(Step):
+    def __init__(self):
+        self.name = 'quantile_norm'
+    
+    def process(self, data):
+        from sortedcontainers import SortedList
+        
+        data = super().process(data)
+        vals = data.get_data()
+        allvals = vals.flatten()
+        newvals = []
+        for i in range(vals.shape[0]):
+            idx = SortedList(vals[i,np.isfinite(vals[i,:])])
+            nvals = len(idx)
+            newvals.append([idx.index(i)/nvals if np.isfinite(i) else np.nan for i in vals[i,:]])
+        vals = np.array(newvals)
+
 
 
 # =============================================================================
