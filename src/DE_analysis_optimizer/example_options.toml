@@ -22,6 +22,14 @@ B = []
 #A list of column names in the data file for ground-truths. The first listed column will be the optimization target.
 ground_truths = []
 
+#The column name with the semicolon delimited list of proteins a peptide matches to.
+proteins_col = ''
+
+#The .tsv of protein names and associated ground truth significance calls in a proteins X ground-truth-definition matrix.
+#The column holding protein names must also be protiens_col.
+#If protein rollup is not being done leave this as ''.
+protein_metadata = 'metadata.tsv'
+
 #A table of lists defining which pipeline steps are to be used for this optimization run.
 #Each list contains the options for that step in the pipeline.
 #Each list can be named whatever you want but should start with the order number.

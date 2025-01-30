@@ -9,11 +9,13 @@ Created on Mon Jan 27 15:10:36 2025
 import numpy as np
 
 class Data:
-    def __init__(self, options, df):
+    def __init__(self, options, df, metadata_df = None):
         self.history = ''
         self.A_cols = list(options.A)
         self.B_cols = list(options.B)
         self.ground_truths = list(options.ground_truths)
+        self.proteins = options.proteins_col
+        self.protein_metadata = metadata_df
         self.data = df
         self.data['prob_score'] = [np.nan]*df.shape[0]
         self.data['is_significant'] = [True]*df.shape[0]
@@ -59,6 +61,20 @@ class Data:
 
     def set_score(self, results):
         self.data['prob_score'] = results
+    
+    def get_protiens(self):
+        return self.data[self.proteins]
 
-
+    def get_df(self):
+        return self.df
+    
+    def set_df(self, data):
+        self.data = data
+        if not 'prob_score' in list(self.data.columns):
+            self.data['prob_score'] = [np.nan]*self.data.shape[0]
+        if not 'is_significant' in list(self.data.columns):
+            self.data['is_significant'] = [True]*self.data.shape[0]
+    
+    def get_metadata(self):
+        return self.protein_metadata
 

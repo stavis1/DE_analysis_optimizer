@@ -29,5 +29,10 @@ def read_data(options):
     from DE_analysis_optimizer.data import Data
     
     df = pd.read_csv(options.data_file, sep = '\t')
-    data = Data(options, df)
+    if options.protein_metadata:
+        metadata = pd.read_csv(options.data)
+        data = Data(options, df, metadata)
+    else:
+        data = Data(options, df)
+    
     return data
