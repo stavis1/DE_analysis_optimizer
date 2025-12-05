@@ -58,7 +58,7 @@ class UniqueSummedAbundance(BaseSummedAbundance):
         
 class AllSummedAbundance(BaseSummedAbundance):
     def __init__(self):
-        self.name = 'unique_summed_abundance'
+        self.name = 'all_summed_abundance'
     
     def process(self, data):
         from copy import copy
