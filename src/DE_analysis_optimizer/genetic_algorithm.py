@@ -8,20 +8,20 @@ Created on Wed Jan 29 15:36:09 2025
 
 from DE_analysis_optimizer.pipeline import Pipeline
 
-#set up a random number generator for breeding and mutation
-import numpy as np
-rng = np.random.default_rng(1)
-
 def get_breeding_population(outcomes):
     from sortedcontainers import SortedList
     
+    #sorted lists substantially speed up dominance checks
     recall_order = SortedList(outcomes, key = lambda o: o.recall)
     PPV_order = SortedList(outcomes, key = lambda o: o.PPV)
     
     double_pareto_front = [] #this will be all outcomes that are dominated by at most one other outcome
     for outcome in outcomes:
+        #find all outcomes better in each dimension
         recall_idx = recall_order.bisect_right(outcome)
         PPV_idx = PPV_order.bisect_right(outcome)
+        
+        #identify dominating outcomes
         dominators = set(recall_order[recall_idx:]).intersection(PPV_order[PPV_idx:])
         if len(dominators) <= 1:
             double_pareto_front.append(outcome)
@@ -29,8 +29,8 @@ def get_breeding_population(outcomes):
     return double_pareto_front
         
 def breed(options, breeders, all_pipeline_steps):
-    parent1, parent2 = rng.choice(breeders, 2, replace = False)
-    step_choices = rng.choice((0,1), len(parent1.steps))
+    parent1, parent2 = options.rng.choice(breeders, 2, replace = False)
+    step_choices = options.rng.choice((0,1), len(parent1.steps))
     new_steps = [parent1.steps[i] if choice else parent2.steps[i] for i, choice in enumerate(step_choices)]
     child = Pipeline(options)
     step_orders = sorted(list(options.step_options.keys()))
@@ -41,8 +41,8 @@ def breed(options, breeders, all_pipeline_steps):
 
 def mutate(options, pipeline, attempts, all_pipeline_steps):
     while pipeline in attempts:
-        order = rng.choice(list(options.step_options.keys()))
-        step = all_pipeline_steps[rng.choice(options.step_options[order])]
+        order = options.rng.choice(list(options.step_options.keys()))
+        step = all_pipeline_steps[options.rng.choice(options.step_options[order])]
         pipeline.add_step(step, order)
     return pipeline
 

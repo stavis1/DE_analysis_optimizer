@@ -22,6 +22,8 @@ class Options:
         self.validate_inputs()        
         if self.cores < 1:
             self.cores = os.cpu_count()
+        import numpy as np
+        self.rng = np.random.default_rng(self.rng_seed)
     
     def parse_args(self):
         #parse command line arguments
@@ -60,7 +62,8 @@ class Options:
                     'overwrite',
                     'cores',
                     'data_file',
-                    'step_options']
+                    'step_options',
+                    'rng_seed']
         problems = [r for r in required if not r in self.__dict__.keys()]
         if problems:
             msg = 'Required settings not found in options file:\n' + '\n'.join(problems)

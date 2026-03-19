@@ -30,12 +30,16 @@ proteins_col = ''
 #If protein rollup is not being done leave this as ''.
 protein_metadata = 'metadata.tsv'
 
+#An integer used to seed the RNG for the genetic algorithm.
+#Note that even with a seeded RNG the algorithm is not expected to be deterministic due to race conditions.
+rng_seed = 1
+
 #A table of lists defining which pipeline steps are to be used for this optimization run.
 #Each list contains the options for that step in the pipeline.
 #Each list can be named whatever you want but should start with the order number.
 [step_options]
-1_protein_rollup = ['noop']
-2_normalization = ['noop']
+1_normalization = ['noop']
+2_protein_rollup = ['noop']
 3_statistical_test = ['noop']
 4_multiplicity_correction = ['noop']
 5_effect_size_filter = ['noop']

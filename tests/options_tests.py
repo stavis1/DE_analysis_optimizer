@@ -27,7 +27,8 @@ class optionsTestSuite(testSuite_ancestor_objs.baseTestSuite):
                     'overwrite',
                     'cores',
                     'data_file',
-                    'step_options']
+                    'step_options',
+                    'rng_seed']
         for attr in required:
             tmp = self.options.__dict__[attr]
             del self.options.__dict__[attr]
