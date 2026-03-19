@@ -26,7 +26,7 @@ class Outcome:
 
 class Pipeline:
     def __init__(self, options):
-        self.step_order = sorted(list(options.step_options.keys()))
+        self.step_order = options.step_order
         self.steps = {}
         self.results = []
     
@@ -40,8 +40,11 @@ class Pipeline:
         self.steps[order] = step
     
     def run(self, data):
+        #run the pipeline
         for step in self.step_order:
             data = self.steps[step].process(data)
+        
+        #calculate quality metrics for each definition of ground truth
         truths = data.get_truths()
         significant = data.get_significance()
         tp = np.nansum(np.logical_and(significant[:,np.newaxis], truths), axis = 0)

@@ -24,7 +24,7 @@ class Options:
             self.cores = os.cpu_count()
         import numpy as np
         self.rng = np.random.default_rng(self.rng_seed)
-        self.step_orders = sorted(list(self.step_options.keys()))
+        self.step_order = sorted(list(self.step_options.keys()))
     
     def parse_args(self):
         #parse command line arguments
@@ -85,7 +85,10 @@ class Options:
 
     def print_options(self, path):
         import shutil
+        #find location of __main__.py
         resolved_path = os.path.abspath(os.path.dirname(__file__))
+        
+        #copy example options to requested location
         example_options = os.path.join(resolved_path, 'example_options.toml')
         shutil.copy2(example_options, path)
 

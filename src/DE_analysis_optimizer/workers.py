@@ -71,11 +71,10 @@ def run_data_manager(options, pipes):
     import os
 
     #initialize the outcomes file
-    steps = sorted(list(options.step_options.keys()))
     outcomes = [f'{col}_{metric}' for col in options.ground_truths for metric in ('recall', 'PPV')]
     outcomes_file = os.path.join(options.output_directory, 'outcomes.tsv')
     with open(outcomes_file, 'w') as tsv:
-        tsv.write('\t'.join(steps + outcomes) + '\n')
+        tsv.write('\t'.join(options.step_order + outcomes) + '\n')
         
     #monitor pipes
     attempts = []
