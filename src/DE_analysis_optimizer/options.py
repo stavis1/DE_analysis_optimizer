@@ -24,6 +24,7 @@ class Options:
             self.cores = os.cpu_count()
         import numpy as np
         self.rng = np.random.default_rng(self.rng_seed)
+        self.step_orders = sorted(list(self.step_options.keys()))
     
     def parse_args(self):
         #parse command line arguments

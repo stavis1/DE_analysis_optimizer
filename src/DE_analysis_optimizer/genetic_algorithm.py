@@ -33,8 +33,7 @@ def breed(options, breeders, all_pipeline_steps):
     step_choices = options.rng.choice((0,1), len(parent1.steps))
     new_steps = [parent1.steps[i] if choice else parent2.steps[i] for i, choice in enumerate(step_choices)]
     child = Pipeline(options)
-    step_orders = sorted(list(options.step_options.keys()))
-    for step_name, order in zip(new_steps, step_orders):
+    for step_name, order in zip(new_steps, options.step_orders):
         step = all_pipeline_steps[step_name]
         child.add_step(step, order)
     return child
