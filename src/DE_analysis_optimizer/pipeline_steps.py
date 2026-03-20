@@ -6,7 +6,7 @@ Created on Mon Jan 27 14:55:47 2025
 @author: 4vt
 """
 
-from pandas import pd
+import pandas as pd
 import numpy as np
 
 class Step():
