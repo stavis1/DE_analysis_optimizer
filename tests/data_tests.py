@@ -69,5 +69,7 @@ class dataTestSuite(testSuite_ancestor_objs.baseTestSuite):
             newsum = np.sum(np.isfinite(self.data.get_score()))
             self.assertEqual(newsum, np.sum(np.isfinite(newresults)))
             self.assertNotEqual(results_init, newsum)
-            
-    
+
+
+if __name__ == '__main__':
+    unittest.main()

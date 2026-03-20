@@ -60,3 +60,5 @@ class pipelineTestSuite(testSuite_ancestor_objs.baseTestSuite):
             self.assertEqual(''.join(results[:len(self.options.step_order)]), pipeline.attempt_line())
 
 
+if __name__ == '__main__':
+    unittest.main()

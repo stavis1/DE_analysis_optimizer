@@ -8,7 +8,7 @@ Created on Mon Jan 27 16:04:18 2025
 import unittest
 from shutil import rmtree
 import os
-from multiprocessing import Pool
+from multiprocessing import Pool, set_start_method
 
 import testSuite_ancestor_objs
 from DE_analysis_optimizer.utils import read_data, init_data_manager
@@ -65,4 +65,6 @@ class utilsTestSuite(testSuite_ancestor_objs.baseTestSuite):
         self.delete('test_output/')
     
 
-
+if __name__ == '__main__':
+    set_start_method('fork')
+    unittest.main()

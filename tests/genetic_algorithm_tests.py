@@ -139,7 +139,8 @@ class geneticAlgorithmTestSuite(testSuite_ancestor_objs.baseTestSuite):
             self.assertEqual(len(pipeline.steps), len(self.options.step_order))
         
         
-        
+if __name__ == '__main__':
+    unittest.main() 
         
         
         

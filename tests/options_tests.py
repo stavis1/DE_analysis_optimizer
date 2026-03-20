@@ -52,3 +52,5 @@ class optionsTestSuite(testSuite_ancestor_objs.baseTestSuite):
         with self.assertRaises(InputError):
             self.options.validate_inputs()
 
+if __name__ == '__main__':
+    unittest.main()
