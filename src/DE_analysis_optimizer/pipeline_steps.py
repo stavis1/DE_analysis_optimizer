@@ -92,7 +92,7 @@ class MeanCenter(Step):
         vals = data.get_data()
         means = np.nanmean(vals, axis = 0)
         grand_mean = np.nanmean(vals)
-        vals = (vals/means[:, np.newaxis])*grand_mean
+        vals = (vals/means[np.newaxis, :])*grand_mean
         data.set_data(vals)
         return data
 
@@ -106,7 +106,7 @@ class LogMeanCenter(Step):
         vals = np.log(vals)
         means = np.nanmean(vals, axis = 0)
         grand_mean = np.nanmean(vals)
-        vals = (vals/means[:, np.newaxis])*grand_mean
+        vals = (vals/means[np.newaxis, :])*grand_mean
         vals = np.exp(vals)
         data.set_data(vals)
         return data
@@ -120,7 +120,7 @@ class MedianCenter(Step):
         vals = data.get_data()
         medians = np.nanmean(vals, axis = 0)
         grand_median = np.nanmedian(vals)
-        vals = (vals/medians[:, np.newaxis])*grand_median
+        vals = (vals/medians[np.newaxis, :])*grand_median
         data.set_data(vals)
         return data
 
@@ -134,7 +134,7 @@ class LogMedianCenter(Step):
         vals = np.log(vals)
         medians = np.nanmean(vals, axis = 0)
         grand_median = np.nanmedian(vals)
-        vals = (vals/medians[:, np.newaxis])*grand_median
+        vals = (vals/medians[np.newaxis, :])*grand_median
         vals = np.exp(vals)
         data.set_data(vals)
         return data

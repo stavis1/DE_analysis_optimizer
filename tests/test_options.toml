@@ -38,7 +38,7 @@ rng_seed = 1
 #Each list contains the options for that step in the pipeline.
 #Each list can be named whatever you want but should start with the order number.
 [step_options]
-1_normalization = ['noop']
+1_normalization = ['noop', 'mean_centering', 'log_mean_centering', 'median_centering', 'log_median_centering']
 2_statistical_test = ['noop']
 3_multiplicity_correction = ['noop']
 4_effect_size_filter = ['noop']
