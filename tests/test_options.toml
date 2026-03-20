@@ -19,15 +19,27 @@ A = ['A1', 'A2', 'A3']
 #A list of column names in the data file for condition B
 B = ['B1', 'B2', 'B3']
 
-#A list of column names in the data file for ground-truths. The first listed column will be the optimization target.
+#A list of column names in the data file or metadata file for ground-truths. The first listed column will be the optimization target.
 ground_truths = ['truth1', 'truth2']
+
+#The column name with the semicolon delimited list of proteins a peptide matches to.
+proteins_col = ''
+
+#The .tsv of protein names and associated ground truth significance calls in a proteins X ground-truth-definition matrix.
+#The column holding protein names must also be protiens_col.
+#If protein rollup is not being done leave this as ''.
+protein_metadata = 'metadata.tsv'
+
+#An integer used to seed the RNG for the genetic algorithm.
+#Note that even with a seeded RNG the algorithm is not expected to be deterministic due to race conditions.
+rng_seed = 1
 
 #A table of lists defining which pipeline steps are to be used for this optimization run.
 #Each list contains the options for that step in the pipeline.
 #Each list can be named whatever you want but should start with the order number.
 [step_options]
-1_protein_rollup = ['noop']
-2_normalization = ['noop']
+1_normalization = ['noop']
+2_protein_rollup = ['noop']
 3_statistical_test = ['noop']
 4_multiplicity_correction = ['noop']
 5_effect_size_filter = ['noop']

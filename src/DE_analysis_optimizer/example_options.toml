@@ -19,7 +19,7 @@ A = []
 #A list of column names in the data file for condition B
 B = []
 
-#A list of column names in the data file for ground-truths. The first listed column will be the optimization target.
+#A list of column names in the data file or metadata file for ground-truths. The first listed column will be the optimization target.
 ground_truths = []
 
 #The column name with the semicolon delimited list of proteins a peptide matches to.
