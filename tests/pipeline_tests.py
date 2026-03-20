@@ -13,19 +13,18 @@ from DE_analysis_optimizer.utils import read_data
 
 class pipelineTestSuite(testSuite_ancestor_objs.baseTestSuite):
     def test_attempt_line_works(self):
-        self.options.step_options = dict(list(self.options.step_options.items())[:2])
         pipeline = Pipeline(self.options)
         class DummyStep(Step):
             def __init__(self):
                 self.name = 'test'
         
-        pipeline.add_step(Noop(), '1_protein_rollup')
-        pipeline.add_step(DummyStep(), '2_normalization')
+        pipeline.add_step(DummyStep(), '1_normalization')
+        for step in self.options.step_order[1:]:
+            pipeline.add_step(Noop(), step)
         attempt = pipeline.attempt_line()
-        self.assertEqual(attempt, 'nooptest')
+        self.assertEqual(attempt, ''.join(['test']+['noop']*(len(self.options.step_order)-1)))
     
     def test_run_and_report_work(self):        
-        self.options.step_options = dict(list(self.options.step_options.items())[:2])
         pipeline = Pipeline(self.options)
         class DummyStep(Step):
             def __init__(self):
@@ -38,8 +37,9 @@ class pipelineTestSuite(testSuite_ancestor_objs.baseTestSuite):
                 data.set_significance([False, True]*(len(scores)//2))
                 return data
         
-        pipeline.add_step(Noop(), '1_protein_rollup')
-        pipeline.add_step(DummyStep(), '2_normalization')
+        pipeline.add_step(DummyStep(), '1_normalization')
+        for step in self.options.step_order[1:]:
+            pipeline.add_step(Noop(), step)
         data = read_data(self.options)
         scores_init = data.get_score()
         significant_init = data.get_significance()
@@ -56,6 +56,6 @@ class pipelineTestSuite(testSuite_ancestor_objs.baseTestSuite):
         
         with self.subTest('Does the report line make sense?'):
             self.assertEqual(len(results), len(self.options.step_options.keys()) + (data.get_truths().shape[1]*2))
-            self.assertEqual(results[0]+results[1], pipeline.attempt_line())
+            self.assertEqual(''.join(results[:len(self.options.step_order)]), pipeline.attempt_line())
 
 
