@@ -30,7 +30,7 @@ def read_data(options):
     
     df = pd.read_csv(options.data_file, sep = '\t')
     if options.protein_metadata:
-        metadata = pd.read_csv(options.data)
+        metadata = pd.read_csv(options.protein_metadata)
         data = Data(options, df, metadata)
     else:
         data = Data(options, df)

@@ -14,7 +14,6 @@ class Data:
         self.A_cols = list(options.A)
         self.B_cols = list(options.B)
         self.ground_truths = list(options.ground_truths)
-        self.proteins = options.proteins_col
         self.protein_metadata = metadata_df
         self.data = df
         self.data['prob_score'] = [np.nan]*df.shape[0]
@@ -63,7 +62,7 @@ class Data:
         self.data['prob_score'] = results
     
     def get_protiens(self):
-        return self.data[self.proteins]
+        return self.data['proteins']
 
     def get_df(self):
         return self.df

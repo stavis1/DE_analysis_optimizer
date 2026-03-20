@@ -28,7 +28,11 @@ class optionsTestSuite(testSuite_ancestor_objs.baseTestSuite):
                     'cores',
                     'data_file',
                     'step_options',
-                    'rng_seed']
+                    'rng_seed',
+                    'A',
+                    'B',
+                    'ground_truths',
+                    'protein_metadata']
         for attr in required:
             tmp = self.options.__dict__[attr]
             del self.options.__dict__[attr]

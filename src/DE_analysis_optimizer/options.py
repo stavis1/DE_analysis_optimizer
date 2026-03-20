@@ -64,7 +64,11 @@ class Options:
                     'cores',
                     'data_file',
                     'step_options',
-                    'rng_seed']
+                    'rng_seed',
+                    'A',
+                    'B',
+                    'ground_truths',
+                    'protein_metadata']
         problems = [r for r in required if not r in self.__dict__.keys()]
         if problems:
             msg = 'Required settings not found in options file:\n' + '\n'.join(problems)

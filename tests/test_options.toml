@@ -11,7 +11,10 @@ output_directory = 'test_output'
 cores = 0
 
 #The tab separated text file containing raw analyte quantities in an analyte X sample matrix
-data_file = 'data.tsv'
+#the analyte column must be named 'analyte'
+#if these are not peptides add the truth columns to this file
+#if these are peptides add a column called 'proteins' that contains semicolon separated lists of the proteins a peptide maps to 
+data_file = 'lipid_data.tsv'
 
 #A list of column names in the data file for condition A
 A = ['A1', 'A2', 'A3']
@@ -22,13 +25,10 @@ B = ['B1', 'B2', 'B3']
 #A list of column names in the data file or metadata file for ground-truths. The first listed column will be the optimization target.
 ground_truths = ['truth1', 'truth2']
 
-#The column name with the semicolon delimited list of proteins a peptide matches to.
-proteins_col = ''
-
-#The .tsv of protein names and associated ground truth significance calls in a proteins X ground-truth-definition matrix.
-#The column holding protein names must also be protiens_col.
+#The tab separated text file of protein names and associated ground truth significance calls in a proteins X ground-truth-definition matrix.
+#The column holding protein names must be named 'proteins'.
 #If protein rollup is not being done leave this as ''.
-protein_metadata = 'metadata.tsv'
+protein_metadata = ''
 
 #An integer used to seed the RNG for the genetic algorithm.
 #Note that even with a seeded RNG the algorithm is not expected to be deterministic due to race conditions.
@@ -44,4 +44,3 @@ rng_seed = 1
 4_multiplicity_correction = ['noop']
 5_effect_size_filter = ['noop']
 6_rules_based_filter = ['noop']
-
