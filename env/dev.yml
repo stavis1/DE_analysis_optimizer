@@ -3,7 +3,7 @@ channels:
 dependencies:
 - python==3.11.9
 - pip
-- numpy
+- numpy==1.23.5
 - dill
 - matplotlib
 - pandas
@@ -11,3 +11,5 @@ dependencies:
 - sortedcontainers
 - spyder
 - statsmodels
+- pip:
+  - --editable=git+https://github.com/stavis1/DE_analysis_optimizer.git#egg=DE_analysis_optimizer
