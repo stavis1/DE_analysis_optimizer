@@ -45,12 +45,11 @@ class geneticAlgorithmTestSuite(testSuite_ancestor_objs.baseTestSuite):
             def __init__(self, name):
                 self.name = name
 
-        N_steps = 10
-        step_options = {}
-        for i in range(N_steps):
-            step_options[str(i)] = [f'{i}_{j}' for j in range(3)]
-        all_pipeline_steps = {n:DummyPipelineStep(n) for l in step_options.values() for n in l}
-        self.options.step_options = step_options
+        all_pipeline_steps = {}
+        for step in self.options.step_order:
+            self.options.step_options[step] = [f'{step} {i}' for  i in range(3)]
+            for step_option in self.options.step_options[step]:
+                all_pipeline_steps[step_option] = DummyPipelineStep(step_option)
         
         #make fake outcomes
         class DummyOutcome():
@@ -58,17 +57,18 @@ class geneticAlgorithmTestSuite(testSuite_ancestor_objs.baseTestSuite):
                 self.recall = recall
                 self.PPV = PPV
                 self.steps = steps
-                self.hash = hash(str(recall + PPV) + ''.join(steps))
+                self.hash = hash(str(recall) + str(PPV) + ''.join(steps))
             
             def __hash__(self):
                 return self.hash
             
             def __eq__(self, o):
                 return self.hash == hash(o)
-            
+        
+        #each outcome pipeline is the i-th element of the step options lists  
+        step_lists = [[self.options.step_options[s][i] for s in self.options.step_order] for i in range(3)]
         recalls = [0.1,0.2,0.3]
         PPVs = [0.2,0.1,0.3]
-        step_lists = [[f'{i}_{j}' for i in range(N_steps)] for j in range(3)]
         outcomes = [DummyOutcome(recall, PPV, steps) for recall, PPV, steps in zip(recalls, PPVs, step_lists)]
         
         #test breeding function
@@ -85,12 +85,11 @@ class geneticAlgorithmTestSuite(testSuite_ancestor_objs.baseTestSuite):
             def __init__(self, name):
                 self.name = name
 
-        N_steps = 10
-        step_options = {}
-        for i in range(N_steps):
-            step_options[str(i)] = [f'{i}_{j}' for j in range(3)]
-        all_pipeline_steps = {n:DummyPipelineStep(n) for l in step_options.values() for n in l}
-        self.options.step_options = step_options
+        all_pipeline_steps = {}
+        for step in self.options.step_order:
+            self.options.step_options[step] = [f'{step} {i}' for  i in range(3)]
+            for step_option in self.options.step_options[step]:
+                all_pipeline_steps[step_option] = DummyPipelineStep(step_option)
         
         #make fake outcomes
         class DummyOutcome():
@@ -98,17 +97,18 @@ class geneticAlgorithmTestSuite(testSuite_ancestor_objs.baseTestSuite):
                 self.recall = recall
                 self.PPV = PPV
                 self.steps = steps
-                self.hash = hash(str(recall + PPV) + ''.join(steps))
+                self.hash = hash(str(recall) + str(PPV) + ''.join(steps))
             
             def __hash__(self):
                 return self.hash
             
             def __eq__(self, o):
                 return self.hash == hash(o)
-            
+        
+        #each outcome pipeline is the i-th element of the step options lists  
+        step_lists = [[self.options.step_options[s][i] for s in self.options.step_order] for i in range(3)]
         recalls = [0.1,0.2,0.3]
         PPVs = [0.2,0.1,0.3]
-        step_lists = [[f'{i}_{j}' for i in range(N_steps)] for j in range(3)]
         outcomes = [DummyOutcome(recall, PPV, steps) for recall, PPV, steps in zip(recalls, PPVs, step_lists)]
         
         #test mutation function
