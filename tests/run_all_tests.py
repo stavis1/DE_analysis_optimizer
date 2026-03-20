@@ -14,6 +14,7 @@ from data_tests import *
 from pipeline_tests import *
 from genetic_algorithm_tests import *
 from workers_tests import *
+from pipeline_steps_tests import *
 
 if __name__ == '__main__':
     set_start_method('fork')

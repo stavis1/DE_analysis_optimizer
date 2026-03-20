@@ -29,18 +29,10 @@ def reader(pipe):
     outcome = pipe.recv()
     return (attempt, outcome)
 
-class utilsTestSuite(testSuite_ancestor_objs.baseTestSuite):
-    def delete(self, path):
-        if os.path.exists(path):
-            if os.path.isfile(path):
-                os.remove(path)
-            else:
-                rmtree(path, ignore_errors=True)
-    
+class utilsTestSuite(testSuite_ancestor_objs.baseTestSuite):    
     def test_data_reader_finds_data(self):
         data = read_data(self.options)
         self.assertIsNotNone(data.get_data())
-        self.delete('test_output/')
 
     def test_data_manager_works(self):
         self.delete('test_output/outcomes.tsv')
@@ -61,9 +53,7 @@ class utilsTestSuite(testSuite_ancestor_objs.baseTestSuite):
             with open('test_output/outcomes.tsv', 'r') as tsv:
                 text = tsv.readlines()[1]
                 self.assertEqual(text, 'test\t0.1\t0.2\n')
-        
-        self.delete('test_output/')
-    
+            
 
 if __name__ == '__main__':
     set_start_method('fork')
