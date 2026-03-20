@@ -30,7 +30,10 @@ def get_breeding_population(outcomes):
         
 def breed(options, breeders, all_pipeline_steps):
     #get two parents from the breeding population
-    parent1, parent2 = options.rng.choice(breeders, 2, replace = False)
+    if len(breeders) > 1:
+        parent1, parent2 = options.rng.choice(breeders, 2, replace = False)
+    else:
+        parent1, parent2 = breeders[0]
     
     #choose which parent donates a step for each step in the new pipeline
     step_choices = options.rng.choice((0,1), len(parent1.steps))
@@ -44,7 +47,7 @@ def breed(options, breeders, all_pipeline_steps):
     return child
 
 def mutate(options, pipeline, attempts, all_pipeline_steps):
-    #Randomly change steps in the pipeline until it is different from any pipeline yet attempted
+    #randomly change steps in the pipeline until it is different from any pipeline yet attempted
     while pipeline in attempts:
         order = options.rng.choice(list(options.step_options.keys()))
         step = all_pipeline_steps[options.rng.choice(options.step_options[order])]
@@ -52,7 +55,14 @@ def mutate(options, pipeline, attempts, all_pipeline_steps):
     return pipeline
 
 
-
+def random_pipeline(options, all_pipeline_steps):
+    #initialize a pipeline with random choices for each step
+    pipeline = Pipeline(options)
+    for order in options.step_order:
+        choice = options.rng.choice(options.step_options[order])
+        step = all_pipeline_steps[choice]
+        pipeline.add_step(step, order)
+    return pipeline
 
 
 

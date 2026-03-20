@@ -5,6 +5,7 @@ Created on Wed Jan 29 14:54:06 2025
 
 @author: 4vt
 """
+import unittest
 import numpy as np
 import testSuite_ancestor_objs
 from DE_analysis_optimizer.pipeline import Pipeline

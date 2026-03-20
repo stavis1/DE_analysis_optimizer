@@ -18,31 +18,30 @@ def run_optimization_worker(options, initial_data, pipe):
     Each will run an infinite loop of optimization steps. 
     '''
     from copy import deepcopy
-    from DE_analysis_optimizer.genetic_algorithm import get_breeding_population, breed, mutate
-    from DE_analysis_optimizer import pipeline_steps
-
-    #set up a dictionary that maps pipeline step names to their objects
-    all_pipeline_steps = {}
-    for Step in pipeline_steps.__dict__.values():
-        if type(Step) == type:
-            step = Step()
-            if hasattr(step, 'name') and type(step.name) == str:
-                all_pipeline_steps[step.name] = step
+    import numpy as np
+    from DE_analysis_optimizer.genetic_algorithm import get_breeding_population, breed, mutate, random_pipeline
+    from DE_analysis_optimizer.utils import get_all_pipeline_steps
     
+    all_pipeline_steps = get_all_pipeline_steps()
     outcomes = []
     attempts = set()
     while True:
         #read outcomes
         pipe.send(Message('get_outcomes', len(outcomes)))
-        outcomes.extend(pipe.recv())
+        if pipe.poll():
+            outcomes.extend(pipe.recv())
         
         #generate new pipeline
-        outcomes = get_breeding_population(outcomes)
-        pipeline = breed(options, outcomes, all_pipeline_steps)
+        if outcomes:
+            outcomes = get_breeding_population(outcomes)
+            pipeline = breed(options, outcomes, all_pipeline_steps)
+        else:
+            pipeline = random_pipeline(options, all_pipeline_steps)
         
         #read attempted pipelines
         pipe.send(Message('get_attempts', len(attempts)))
-        attempts.update(pipe.recv())
+        if pipe.poll():
+            attempts.update(pipe.recv())
         
         #ensure the new pipeline is unique
         pipeline = mutate(options, pipeline, attempts, all_pipeline_steps)
@@ -51,15 +50,22 @@ def run_optimization_worker(options, initial_data, pipe):
         attempt = pipeline.attempt_line()
         pipe.send(Message('submit_attempt', attempt))
         
-        #set up new working data
-        data = deepcopy(initial_data)
-
-        #run the pipeline
-        pipeline.run(data)
+        try:
+            #set up new working data
+            data = deepcopy(initial_data)
+    
+            #run the pipeline
+            pipeline.run(data)
+            
+            #write outcomes
+            outcome = pipeline.report()
+            pipe.send(Message('submit_outcome', outcome))
         
-        #write outcomes
-        outcome = pipeline.report()
-        pipe.send(Message('submit_outcome', outcome))
+        except:
+            #failed pipelines get nan metrics
+            pipeline.results = [np.nan]*len(options.ground_truths)*2
+            outcome = pipeline.report()
+            pipe.send(Message('submit_outcome', outcome))
 
 def run_data_manager(options, pipes):
     '''
@@ -69,6 +75,7 @@ def run_data_manager(options, pipes):
     Provides lists of outcomes upon request.
     '''
     import os
+    import traceback
 
     #initialize the outcomes file
     outcomes = [f'{col}_{metric}' for col in options.ground_truths for metric in ('recall', 'PPV')]
@@ -95,9 +102,7 @@ def run_data_manager(options, pipes):
                     pipe.send(outcomes[message.value:])
                 elif message.purpose == 'submit_outcome':
                     outcomes.append(message.value)
+
                     with open(outcomes_file, 'a') as tsv:
                         tsv.write('\t'.join(str(e) for e in message.value.report()) + '\n')
-
-
-
 

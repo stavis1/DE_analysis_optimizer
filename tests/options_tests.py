@@ -5,7 +5,7 @@ Created on Thu Apr 18 12:07:49 2024
 
 @author: 4vt
 """
-
+import unittest
 from shutil import rmtree
 
 from DE_analysis_optimizer.options import InputError

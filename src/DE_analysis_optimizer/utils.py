@@ -36,3 +36,17 @@ def read_data(options):
         data = Data(options, df)
     
     return data
+
+def get_all_pipeline_steps():
+    from DE_analysis_optimizer import pipeline_steps
+
+    #set up a dictionary that maps pipeline step names to their objects
+    all_pipeline_steps = {}
+    for Step in pipeline_steps.__dict__.values():
+        if type(Step) == type:
+            step = Step()
+            if hasattr(step, 'name') and type(step.name) == str:
+                all_pipeline_steps[step.name] = step
+    
+    return all_pipeline_steps
+

@@ -5,12 +5,12 @@ Created on Wed Jan 29 17:22:29 2025
 
 @author: 4vt
 """
-
+import unittest
 import numpy as np
 rng = np.random.default_rng(1)
 
 import testSuite_ancestor_objs
-from DE_analysis_optimizer.genetic_algorithm import get_breeding_population, breed, mutate
+from DE_analysis_optimizer.genetic_algorithm import get_breeding_population, breed, mutate, random_pipeline
 
 class geneticAlgorithmTestSuite(testSuite_ancestor_objs.baseTestSuite):
     def test_get_breeding_pop_works(self):
@@ -120,5 +120,27 @@ class geneticAlgorithmTestSuite(testSuite_ancestor_objs.baseTestSuite):
        
         with self.subTest('Did some amount of mutation happen?'):
             self.assertNotEqual(steps_chosen, steps_chosen_init)
+    
+    def test_random_pipeline(self):
+        #make fake pipeline options
+        class DummyPipelineStep():
+            def __init__(self, name):
+                self.name = name
 
+        all_pipeline_steps = {}
+        for step in self.options.step_order:
+            self.options.step_options[step] = [f'{step} {i}' for  i in range(3)]
+            for step_option in self.options.step_options[step]:
+                all_pipeline_steps[step_option] = DummyPipelineStep(step_option)
+        
+        pipeline = random_pipeline(self.options, all_pipeline_steps)
+        
+        with self.subTest('Was a random pipeline made'):
+            self.assertEqual(len(pipeline.steps), len(self.options.step_order))
+        
+        
+        
+        
+        
+        
         
