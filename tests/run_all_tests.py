@@ -17,5 +17,6 @@ from workers_tests import *
 from pipeline_steps_tests import *
 
 if __name__ == '__main__':
+    import make_test_data
     set_start_method('fork')
     unittest.main()

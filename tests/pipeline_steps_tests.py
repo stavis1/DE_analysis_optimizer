@@ -38,6 +38,7 @@ class NormalizationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
 
 
 if __name__ == '__main__':
+    import make_test_data
     unittest.main()
 
 

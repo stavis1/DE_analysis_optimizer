@@ -17,10 +17,10 @@ cores = 0
 data_file = 'data.tsv'
 
 #A list of column names in the data file for condition A
-A = ['A1', 'A2', 'A3']
+A = ['A0', 'A1', 'A2']
 
 #A list of column names in the data file for condition B
-B = ['B1', 'B2', 'B3']
+B = ['B0', 'B1', 'B2']
 
 #A list of column names in the data file or metadata file for ground-truths. The first listed column will be the optimization target.
 ground_truths = ['truth1', 'truth2']

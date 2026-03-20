@@ -53,4 +53,5 @@ class optionsTestSuite(testSuite_ancestor_objs.baseTestSuite):
             self.options.validate_inputs()
 
 if __name__ == '__main__':
+    import make_test_data
     unittest.main()

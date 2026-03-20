@@ -140,6 +140,7 @@ class geneticAlgorithmTestSuite(testSuite_ancestor_objs.baseTestSuite):
         
         
 if __name__ == '__main__':
+    import make_test_data
     unittest.main() 
         
         
