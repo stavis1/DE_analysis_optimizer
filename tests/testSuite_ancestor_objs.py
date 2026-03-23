@@ -44,10 +44,10 @@ class basePipelineStepTestSuite(baseTestSuite):
         import numpy as np
         
         for step_option in self.step_options:
-            data = deepcopy(self.data)
-            data = self.pipeline_steps[step_option].process(data)
+            this_data = deepcopy(self.data)
+            this_data = self.pipeline_steps[step_option].process(this_data)
             with self.subTest('Can {step_option} handle nan values?'):
-                self.assertTrue(np.any(np.isfinite(data.get_data())))
+                self.assertTrue(np.any(np.isfinite(this_data.get_data())))
             
 class baseLipidomicsTestSuite(basePipelineStepTestSuite):
     def setUp(self):
@@ -55,7 +55,7 @@ class baseLipidomicsTestSuite(basePipelineStepTestSuite):
         self.data = read_data(self.options)
         self.pipeline_steps = get_all_pipeline_steps()
     
-class baseProteomisTestSuite(basePipelineStepTestSuite):
+class baseProteomicsTestSuite(basePipelineStepTestSuite):
     def setUp(self):
         super().setUp()
         test_path = os.path.dirname(__name__)

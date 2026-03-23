@@ -61,11 +61,11 @@ class Data:
     def set_score(self, results):
         self.data['prob_score'] = results
     
-    def get_protiens(self):
+    def get_proteins(self):
         return self.data['proteins']
 
     def get_df(self):
-        return self.df
+        return self.data
     
     def set_df(self, data):
         self.data = data

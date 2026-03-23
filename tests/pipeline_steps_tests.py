@@ -35,7 +35,12 @@ class NormalizationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
                 with self.subTest(f'Can {step_option} remove a multiplicative shift?'):
                     self.assertLess(mean_diff, init_mean_diff)
 
-
+class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setUp()
+        self.step_options = self.options.step_options['2_protein_rollup']
+        self.tearDown()
 
 if __name__ == '__main__':
     import make_test_data

@@ -21,10 +21,10 @@ class BaseSummedAbundance(Step):
     def sum_abundance(self, data):
         df = data.get_df()
         metadata = data.get_metadata()
-        metadata.index = metadata[data.proteins]
-        del metadata[data.proteins]
+        metadata.index = metadata['proteins']
+        del metadata['proteins']
         quantcols = list(data.A_cols) + list(data.B_cols)
-        proteins = df[[data.proteins] + quantcols].groupby(data.proteins).sum()
+        proteins = df[['proteins'] + quantcols].groupby('proteins').sum()
         proteins = proteins.merge(metadata, 
                                   how = 'left',
                                   left_index = True,
@@ -52,7 +52,7 @@ class UniqueSummedAbundance(BaseSummedAbundance):
     def process(self, data):
         data = super().process(data)
         good_peps = [';' not in pr for pr in data.get_proteins()]
-        data = data.prune(good_peps)
+        data.prune(good_peps)
         data = self.sum_abundance(data)
         return data
         
@@ -68,12 +68,12 @@ class AllSummedAbundance(BaseSummedAbundance):
         dup_rows = []
         nonunique = [';' in pr for pr in data.get_proteins()]
         for _, row in df[nonunique].iterrows():
-            prots = row[data.proteins].split(';')
+            prots = row['proteins'].split(';')
             for prot in prots:
                 newrow = copy(row)
-                newrow[data.proteins] = prot
+                newrow['proteins'] = prot
                 dup_rows.append(newrow)
-        df = df[[';' not in pr for pr in data.get_proteins]]
+        df = df[[';' not in pr for pr in data.get_proteins()]]
         df = pd.concat([df] + dup_rows)
         data.set_df(df)
         data = self.sum_abundance(data)

@@ -18,7 +18,7 @@ N = 3
 #make analyte intensity data
 #means are lognormally distributed
 data = pd.DataFrame({'analyte':[f'peptide{i}' for i in range(p)],
-                     'protein':[f'protein{i%(p_prot)}' for i in range(p)]})
+                     'proteins':[f'protein{i%(p_prot)}' for i in range(p)]})
 means = np.abs(np.exp2(rng.normal(18, 5, p)))
 #apply multiplicative noise
 noise = np.abs(rng.normal(1, 0.1, (p,N*2)))
@@ -30,13 +30,13 @@ values[missingness_prob < 0.2] = np.nan
 #write protein data
 data[[f'{c}{i}' for c in 'AB' for i in range(N)]] = values
 data.to_csv('data.tsv', sep = '\t')
-metadata = pd.DataFrame({'protein':[f'protein{i}' for i in range(p_prot)],
+metadata = pd.DataFrame({'proteins':[f'protein{i}' for i in range(p_prot)],
                          'truth1':[False]*(p_prot//2) + [True]*(p_prot//2),
                          'truth2':rng.choice((True, False), p_prot)})
 metadata.to_csv('metadata.tsv', sep = '\t')
 
 #write lipid data
-del data['protein']
+del data['proteins']
 data['truth1'] = [False]*(p//2) + [True]*(p//2)
 data['truth2'] = rng.choice((True, False), p)
 data.to_csv('lipid_data.tsv', sep = '\t')
