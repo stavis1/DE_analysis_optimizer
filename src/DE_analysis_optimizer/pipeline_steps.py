@@ -216,6 +216,20 @@ class Bonferroni(Step):
 # =============================================================================
 # effect size filter choices
 # =============================================================================
+class Min2FC(Step):
+    def __init__(self):
+        self.name = 'bonferroni'
+    
+    def process(self, data):
+        data = super().process(data)
+        mean_A = np.nanmean(data.get_A(), axis = 1)
+        mean_B = np.nanmean(data.get_B(), axis = 1)
+        l2fc = np.log2(mean_A/mean_B)
+        valid = l2fc >= np.log2(2)
+        significant = data.get_significance()
+        significant = np.logical_and(significant, valid)
+        data.set_significance(significant)
+        return data
 
 
 # =============================================================================
