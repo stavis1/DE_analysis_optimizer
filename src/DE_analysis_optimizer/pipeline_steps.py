@@ -228,9 +228,11 @@ class Min2FC(BaseFilter):
     
     def process(self, data):
         data = super().process(data)
-        mean_A = np.nanmean(data.get_A(), axis = 1)
-        mean_B = np.nanmean(data.get_B(), axis = 1)
-        l2fc = np.log2(mean_A/mean_B)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            mean_A = np.nanmean(data.get_A(), axis = 1)
+            mean_B = np.nanmean(data.get_B(), axis = 1)
+            l2fc = np.log2(mean_A/mean_B)
         valid = l2fc >= np.log2(2)
         data = self.significance_filter(data, valid)
         return data
@@ -247,7 +249,7 @@ class MinValid50(BaseFilter):
         data = super().process(data)
         vals = data.get_data()
         n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
-        valid = (n_missing/vals.shape[1]) > 0.5
+        valid = (n_missing/vals.shape[1]) < 0.5
         data = self.significance_filter(data, valid)
         return data
 
@@ -259,10 +261,10 @@ class MinValid50PerCond(BaseFilter):
         data = super().process(data)
         vals = data.get_A()
         n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
-        valid = (n_missing/vals.shape[1]) > 0.5
+        valid = (n_missing/vals.shape[1]) < 0.5
         vals = data.get_B()
         n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
-        valid = np.logical_and((n_missing/vals.shape[1]) > 0.5, valid)
+        valid = np.logical_and((n_missing/vals.shape[1]) < 0.5, valid)
         data = self.significance_filter(data, valid)
         return data
 

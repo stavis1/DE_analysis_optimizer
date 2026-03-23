@@ -218,7 +218,7 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
         
         #null out rows of condition A where ground truth 1 is true
         A = self.data.get_A()
-        A[self.truth_1] = np.nan
+        A[np.logical_not(self.truth_1)] = np.nan
         self.data.set_A(A)
         
         for step_option in ['50_valid', '50_valid_per_cond']:
