@@ -204,6 +204,24 @@ class StudentT(Step):
         data.set_score(results.pvalue)
         return data
 
+class WelchT(Step):
+    def __init__(self):
+        self.name = 'welch_t'
+    
+    def process(self, data):
+        data = super().process(data)
+        #run a student's t-test
+        from scipy.stats import ttest_ind
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = ttest_ind(data.get_A(),
+                                data.get_B(),
+                                equal_var = False,
+                                nan_policy = 'omit',
+                                axis = 1)
+        data.set_score(results.pvalue)
+        return data
+
 # =============================================================================
 # multiplicity correction choices
 # =============================================================================
@@ -250,7 +268,6 @@ class Min15FC(BaseFilter):
         valid = l2fc >= np.log2(1.5)
         data = self.significance_filter(data, valid)
         return data
-
 
 # =============================================================================
 # rules-based filter choices
