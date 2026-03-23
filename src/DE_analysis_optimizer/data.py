@@ -13,13 +13,15 @@ class Data:
         self.history = ''
         self.A_cols = list(options.A)
         self.B_cols = list(options.B)
+        self.quantcols = self.A_cols + self.B_cols
         self.ground_truths = list(options.ground_truths)
         self.protein_metadata = metadata_df
         self.data = df
+        self.data.index = self.data['analyte']
         self.data['prob_score'] = [np.nan]*df.shape[0]
         self.data['is_significant'] = [True]*df.shape[0]
-        self.observed = self.data[self.A_cols + self.B_cols].copy()
-        self.observed[self.A_cols + self.B_cols] = np.logical_not(np.isfinite(self.observed.to_numpy()))
+        self.observed = self.data[self.quantcols].copy()
+        self.observed[self.quantcols] = np.logical_not(np.isfinite(self.observed.to_numpy()))
     
     def __hash__(self):
         return hash(self.history)
@@ -40,10 +42,10 @@ class Data:
         self.data[self.B_cols] = data
     
     def get_data(self):
-        return self.data[self.A_cols + self.B_cols].to_numpy()
+        return self.data[self.quantcols].to_numpy()
     
     def set_data(self, data):
-        self.data[self.A_cols + self.B_cols] = data
+        self.data[self.quantcols] = data
     
     def prune(self, to_keep):
         self.data = self.data[to_keep]
@@ -88,11 +90,12 @@ class Data:
         return self.observed[self.B_cols].to_numpy()
     
     def recalculate_missingness(self):
-        quantcols = self.A_cols + self.B_cols
-        self.observed = self.data[quantcols].copy()
+        self.observed = self.data[self.quantcols].copy()
         vals = self.observed.to_numpy()
         vals = np.logical_not(np.isfinite(vals))
-        self.observed[quantcols] = vals
+        self.observed[self.quantcols] = vals
+        self.observed.index = self.data['analyte']
+
         
     def get_metadata(self):
         return self.protein_metadata
