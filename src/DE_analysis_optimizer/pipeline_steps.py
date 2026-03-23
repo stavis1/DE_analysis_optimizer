@@ -164,9 +164,6 @@ class QuantileNorm(Step):
         vals[mask] = np.nanquantile(allvals, vals[mask])
         data.set_data(vals)
         return data
-        
-
-
 
 # =============================================================================
 # imputation choices
@@ -182,6 +179,33 @@ class ZeroFill(Step):
         vals[np.logical_not(np.isfinite(vals))] = 0
         data.set_data(vals)
         return data
+
+class Perseus(Step):
+    def __init__(self):
+        self.name = 'perseus'
+    
+    def process(self, data):
+        rng = np.random.default_rng(1)
+        data = super().process(data)
+        #transform
+        vals = data.get_data()
+        vals = np.log2(vals)
+        
+        #calculate RNG parameters
+        mean = np.nanmean(vals)
+        std = np.nanstd(vals)
+        impute_mean = mean - (1.8*std)
+        impute_std = std*0.3
+        
+        #impute
+        mask = np.logical_not(np.isfinite(vals))
+        vals[mask] = rng.normal(impute_mean, impute_std, vals.shape)[mask]
+        
+        #back-transform
+        vals = np.exp2(vals)
+        data.set_data(vals)
+        return data
+        
 
 # =============================================================================
 # statsitical test choices
