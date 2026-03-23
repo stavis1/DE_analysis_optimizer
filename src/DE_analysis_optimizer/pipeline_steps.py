@@ -201,7 +201,17 @@ class StudentT(Step):
 # =============================================================================
 # multiplicity correction choices
 # =============================================================================
-
+class Bonferroni(Step):
+    def __init__(self):
+        self.name = 'bonferroni'
+    
+    def process(self, data):
+        data = super().process(data)
+        pvals = data.get_score()
+        pvals = pvals/len(pvals)
+        significant = pvals < 0.05
+        data.set_significance(significant)
+        return data
 
 # =============================================================================
 # effect size filter choices
