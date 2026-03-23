@@ -17,10 +17,10 @@ cores = 0
 data_file = 'lipid_data.tsv'
 
 #A list of column names in the data file for condition A
-A = ['A0', 'A1', 'A2']
+A = ['A0', 'A1', 'A2', 'A3', 'A4', 'A5']
 
 #A list of column names in the data file for condition B
-B = ['B0', 'B1', 'B2']
+B = ['B0', 'B1', 'B2', 'B3', 'B4', 'B5']
 
 #A list of column names in the data file or metadata file for ground-truths. The first listed column will be the optimization target.
 ground_truths = ['truth1', 'truth2']
@@ -40,7 +40,7 @@ rng_seed = 1
 [step_options]
 1_normalization = ['noop', 'mean_centering', 'log_mean_centering', 'median_centering', 'log_median_centering', 'quantile_norm']
 2_imputation = ['noop', 'zero_fill', 'perseus']
-3_statistical_test = ['student_t', 'welch_t']
+3_statistical_test = ['student_t', 'welch_t', 'man_whitney_u']
 4_multiplicity_correction = ['no_correction', 'bonferroni', 'fdr']
 5_effect_size_filter = ['noop', 'min_FC_2', 'min_FC_1.5']
 6_rules_based_filter = ['noop', 'min_1_unique', 'min_1_unique_2_total']

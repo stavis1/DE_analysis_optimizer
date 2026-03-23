@@ -13,7 +13,7 @@ import numpy as np
 rng = np.random.default_rng(1)
 p = 100
 p_prot = 50
-N = 3
+N = 6
 
 #make analyte intensity data
 #means are lognormally distributed

@@ -19,13 +19,13 @@ class dataTestSuite(testSuite_ancestor_objs.baseTestSuite):
     
     def test_getters_work(self):
         with self.subTest('Test get_A()'):
-            self.assertEqual((100, 3), self.data.get_A().shape)
+            self.assertEqual((100, 6), self.data.get_A().shape)
 
         with self.subTest('Test get_B()'):
-            self.assertEqual((100, 3), self.data.get_B().shape)    
+            self.assertEqual((100, 6), self.data.get_B().shape)    
 
         with self.subTest('Test get_data()'):
-            self.assertEqual((100, 6), self.data.get_data().shape)    
+            self.assertEqual((100, 12), self.data.get_data().shape)    
 
         with self.subTest('Test get_truths()'):
             self.assertEqual((100, 2), self.data.get_truths().shape)    
@@ -37,19 +37,19 @@ class dataTestSuite(testSuite_ancestor_objs.baseTestSuite):
             self.assertEqual((100,), self.data.get_score().shape)    
 
     def test_setters_work(self):
-        ones_100x3 = np.full((100,3), 1)
+        ones_100x6 = np.full((100,6), 1)
         with self.subTest('Test set_A()'):
             A_init = np.sum(self.data.get_A())
-            self.data.set_A(ones_100x3)
+            self.data.set_A(ones_100x6)
             newsum = np.sum(self.data.get_A())
-            self.assertEqual(newsum, 100*3)
+            self.assertEqual(newsum, 100*6)
             self.assertNotEqual(A_init, newsum)
 
         with self.subTest('Test set_B()'):
             B_init = np.sum(self.data.get_B())
-            self.data.set_B(ones_100x3)
+            self.data.set_B(ones_100x6)
             newsum = np.sum(self.data.get_B())
-            self.assertEqual(newsum, 100*3)
+            self.assertEqual(newsum, 100*6)
             self.assertNotEqual(B_init, newsum)
         
         with self.subTest('Test set_significance()'):

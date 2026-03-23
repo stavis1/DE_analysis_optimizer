@@ -256,6 +256,23 @@ class WelchT(Step):
         data.set_score(results.pvalue)
         return data
 
+class MannWhitneyU(Step):
+    def __init__(self):
+        self.name = 'man_whitney_u'
+    
+    def process(self, data):
+        data = super().process(data)
+        #run a student's t-test
+        from scipy.stats import mannwhitneyu
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = mannwhitneyu(data.get_A(),
+                                   data.get_B(),
+                                   nan_policy = 'omit',
+                                   axis = 1)
+        data.set_score(results.pvalue)
+        return data
+
 # =============================================================================
 # multiplicity correction choices
 # =============================================================================
