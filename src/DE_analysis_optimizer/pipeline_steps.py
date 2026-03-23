@@ -235,5 +235,18 @@ class Min2FC(Step):
 # =============================================================================
 # rules-based filter choices
 # =============================================================================
+class MinValid50(Step):
+    def __init__(self):
+        self.name = '50_valid'
+    
+    def process(self, data):
+        data = super().process(data)
+        vals = data.get_data()
+        n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
+        valid = (n_missing/vals.shape[1]) > 0.5
+        significant = data.get_significance()
+        significant = np.logical_and(significant, valid)
+        data.set_significance(significant)
+        return data
 
 
