@@ -251,7 +251,7 @@ class MinValid50(BaseFilter):
         data = self.significance_filter(data, valid)
         return data
 
-class MinValid50PerCond(Step):
+class MinValid50PerCond(BaseFilter):
     def __init__(self):
         self.name = '50_valid_per_cond'
     
@@ -266,6 +266,16 @@ class MinValid50PerCond(Step):
         data = self.significance_filter(data, valid)
         return data
 
+class Min1Unique(BaseFilter):
+    def __init__(self):
+        self.name = 'min_1_unique'
+    
+    def process(self, data):
+        data = super().process(data)
+        df = data.get_df()
+        valid = df['N_unique_peptides'] >= 1
+        data = self.significance_filter(data, valid)
+        return data
 
 
 
