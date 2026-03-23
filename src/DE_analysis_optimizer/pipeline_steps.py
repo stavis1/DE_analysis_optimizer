@@ -249,4 +249,23 @@ class MinValid50(Step):
         data.set_significance(significant)
         return data
 
+class MinValid50PerCond(Step):
+    def __init__(self):
+        self.name = '50_valid_per_cond'
+    
+    def process(self, data):
+        data = super().process(data)
+        vals = data.get_A()
+        n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
+        valid = (n_missing/vals.shape[1]) > 0.5
+
+        vals = data.get_B()
+        n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
+        valid = np.logical_and((n_missing/vals.shape[1]) > 0.5, valid)
+
+        significant = data.get_significance()
+        significant = np.logical_and(significant, valid)
+        data.set_significance(significant)
+        return data
+
 
