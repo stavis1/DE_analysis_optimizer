@@ -277,6 +277,20 @@ class Bonferroni(Step):
         data.set_score(pvals)
         return data
 
+class FDR(Step):
+    def __init__(self):
+        self.name = 'fdr'
+
+    def process(self, data):
+        from scipy.stats import false_discovery_control
+        data = super().process(data)
+        pvals = data.get_score()
+        mask = np.isfinite(pvals)
+        qvals = false_discovery_control(pvals[mask])
+        pvals[mask] = qvals
+        data.set_significance(pvals < 0.01)
+        data.set_score(pvals)
+        return data
 
 # =============================================================================
 # effect size filter choices
