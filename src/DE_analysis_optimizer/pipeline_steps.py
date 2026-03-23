@@ -36,6 +36,12 @@ class BaseSummedAbundance(Step):
         data.set_df(proteins)
         return data
 
+class BaseFilter(Step):
+    def significance_filter(self, data, valid):
+        significant = data.get_significance()
+        significant = np.logical_and(significant, valid)
+        data.set_significance(significant)
+        return data
 
 class Noop(Step):
     def __init__(self):
@@ -216,7 +222,7 @@ class Bonferroni(Step):
 # =============================================================================
 # effect size filter choices
 # =============================================================================
-class Min2FC(Step):
+class Min2FC(BaseFilter):
     def __init__(self):
         self.name = 'min_FC_2'
     
@@ -226,16 +232,14 @@ class Min2FC(Step):
         mean_B = np.nanmean(data.get_B(), axis = 1)
         l2fc = np.log2(mean_A/mean_B)
         valid = l2fc >= np.log2(2)
-        significant = data.get_significance()
-        significant = np.logical_and(significant, valid)
-        data.set_significance(significant)
+        data = self.significance_filter(data, valid)
         return data
 
 
 # =============================================================================
 # rules-based filter choices
 # =============================================================================
-class MinValid50(Step):
+class MinValid50(BaseFilter):
     def __init__(self):
         self.name = '50_valid'
     
@@ -244,9 +248,7 @@ class MinValid50(Step):
         vals = data.get_data()
         n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
         valid = (n_missing/vals.shape[1]) > 0.5
-        significant = data.get_significance()
-        significant = np.logical_and(significant, valid)
-        data.set_significance(significant)
+        data = self.significance_filter(data, valid)
         return data
 
 class MinValid50PerCond(Step):
@@ -258,14 +260,13 @@ class MinValid50PerCond(Step):
         vals = data.get_A()
         n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
         valid = (n_missing/vals.shape[1]) > 0.5
-
         vals = data.get_B()
         n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
         valid = np.logical_and((n_missing/vals.shape[1]) > 0.5, valid)
-
-        significant = data.get_significance()
-        significant = np.logical_and(significant, valid)
-        data.set_significance(significant)
+        data = self.significance_filter(data, valid)
         return data
+
+
+
 
 
