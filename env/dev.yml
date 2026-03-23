@@ -11,5 +11,6 @@ dependencies:
 - sortedcontainers
 - spyder
 - statsmodels
+- scikit-learn
 - pip:
   - --editable=git+https://github.com/stavis1/DE_analysis_optimizer.git#egg=DE_analysis_optimizer

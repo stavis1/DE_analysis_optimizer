@@ -154,17 +154,17 @@ class QuantileNorm(Step):
         self.name = 'quantile_norm'
     
     def process(self, data):
-        from sortedcontainers import SortedList
-        
+        from sklearn.preprocessing import quantile_transform
         data = super().process(data)
         vals = data.get_data()
         allvals = vals.flatten()
-        newvals = []
-        for i in range(vals.shape[0]):
-            idx = SortedList(vals[i,np.isfinite(vals[i,:])])
-            nvals = len(idx)
-            newvals.append([idx.index(i)/nvals if np.isfinite(i) else np.nan for i in vals[i,:]])
-        vals = np.array(newvals)
+        allvals = allvals[np.isfinite(allvals)]
+        vals = quantile_transform(vals, n_quantiles = vals.shape[0])
+        mask = np.isfinite(vals)
+        vals[mask] = np.nanquantile(allvals, vals[mask])
+        data.set_data(vals)
+        return data
+        
 
 
 
