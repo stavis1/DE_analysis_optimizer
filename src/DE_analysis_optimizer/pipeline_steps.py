@@ -42,9 +42,15 @@ class BaseSummedAbundance(Step):
 
 class BaseFilter(Step):
     def significance_filter(self, data, valid):
+        #update significance
         significant = data.get_significance()
         significant = np.logical_and(significant, valid)
         data.set_significance(significant)
+        
+        #update scores
+        scores = data.get_score()
+        scores[np.logical_not(valid)] = 1
+        data.set_score(scores)
         return data
 
 class Noop(Step):
