@@ -277,6 +277,18 @@ class Min1Unique(BaseFilter):
         data = self.significance_filter(data, valid)
         return data
 
+class Min1Unique2Total(BaseFilter):
+    def __init__(self):
+        self.name = 'min_1_unique_2_total'
+    
+    def process(self, data):
+        data = super().process(data)
+        data = Min1Unique().process(data)
+        df = data.get_df()
+        valid = df['N_peptides'] >= 2
+        data = self.significance_filter(data, valid)
+        return data
+
 
 
 
