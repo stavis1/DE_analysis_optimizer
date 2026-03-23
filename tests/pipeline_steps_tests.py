@@ -8,7 +8,8 @@ Created on Fri Mar 20 15:58:24 2026
 
 import unittest
 import testSuite_ancestor_objs
-
+from copy import deepcopy
+import numpy as np
 
 class NormalizationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
     def __init__(self, *args, **kwargs):
@@ -18,9 +19,6 @@ class NormalizationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
         self.tearDown()
     
     def test_shift_correction(self):
-        from copy import deepcopy
-        import numpy as np
-        
         A = self.data.get_A()
         A *= 1.2
         self.data.set_A(A)
@@ -42,9 +40,7 @@ class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
         self.step_options = self.options.step_options['2_protein_rollup']
         self.tearDown()
 
-    def test_protein_rollup_sanity(self):
-        from copy import deepcopy
-        
+    def test_protein_rollup_sanity(self):        
         #get reference value
         max_N_prots = self.data.get_metadata().shape[0]
         
@@ -62,6 +58,29 @@ class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
             with self.subTest(f'Does {step_option} correctly drop the proteins column?:'):
                 self.assertTrue('proteins' not in list(data.get_df().columns))
 
+class ImputationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setUp()
+        self.step_options = self.options.step_options['2_imputation']
+        self.tearDown()
+    
+    def test_nan_reduction(self):
+        #get reference value
+        init_N_missing = np.sum(np.logical_not(np.isfinite(self.data.get_data())))
+        
+        for step_option in self.step_options:
+            if step_option not in ['noop']:
+                #process data
+                data = deepcopy(self.data)
+                data = self.pipeline_steps[step_option].process(data)
+                N_missing = np.sum(np.logical_not(np.isfinite(data.get_data())))
+                
+                with self.subTest(f'Does {step_option} reduce the number of NANs?'):
+                    self.assertLess(N_missing, init_N_missing)
+                with self.subTest(f'Does {step_option} remove all NANs?'):
+                    self.assertEqual(N_missing, 0)
+
 class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -70,9 +89,6 @@ class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
         self.tearDown()
 
     def test_additive_shift(self):
-        from copy import deepcopy
-        import numpy as np
-        
         truth = self.data.get_truths[:,0]
         means = np.nanmean(self.data.get_data(), axis = 1)
         shifts = truth * 5 * means
