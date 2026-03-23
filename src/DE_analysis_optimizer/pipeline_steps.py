@@ -271,9 +271,12 @@ class Bonferroni(Step):
     def process(self, data):
         data = super().process(data)
         pvals = data.get_score()
-        significant = pvals < (0.05/len(pvals))
+        pvals = np.clip(pvals*len(pvals), a_min = 0, a_max = 1)
+        significant = pvals < 0.05
         data.set_significance(significant)
+        data.set_score(pvals)
         return data
+
 
 # =============================================================================
 # effect size filter choices
