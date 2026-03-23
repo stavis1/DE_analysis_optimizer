@@ -172,6 +172,90 @@ class EffectFilterTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite, tes
                     significant[np.logical_and(self.truth, np.logical_not(sig_init))]
                     self.assertTrue(np.all(np.logical_not(subset)))
                                 
+class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite()):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setUp()
+        self.step_options = self.options.step_options['7_rules_based_filter']
+        self.tearDown()
+
+    def setUp(self, *args, **kwargs):
+        super().setUp(*args, **kwargs)
+        from DE_analysis_optimizer.pipeline_steps import UniqueSummedAbundance
+        self.data = UniqueSummedAbundance().process(self.data)
+        self.truth_0 = self.data.get_truths[:, 0]
+        self.truth_1 = self.data.get_truths()[:,1]
+        self.data.set_significance(self.truth_0)
+
+    
+    def sub_test_battery(self, significant, step_option):
+        with self.subTest(f'Does {step_option} handle NANs?'):
+            self.assertTrue(len(significant) > 0)
+        
+        with self.subTest(f'Does {step_option} remove invalid analytes?'):
+            subset = significant[self.truth_1]
+            self.assertTrue(np.all(np.logical_not(subset)))
+    
+        with self.subTest(f'Does {step_option} retain valid analytes?'):
+            subset = significant[np.logical_and(np.logical_not(self.truth_1), self.truth_0)]
+            self.assertTrue(np.all(subset))
+    
+        with self.subTest(f'Does {step_option} respect negative significance calls?'):
+            subset = significant[np.logical_and(np.logical_not(self.truth_1), self.truth_0)]
+            self.assertTrue(np.all(np.logical_not(subset)))
+    
+    def test_missingness_filters(self):
+        #remove all missing values
+        vals = self.data.get_data()
+        mask = np.logical_not(np.isfinite(vals))
+        vals[mask] = self.options.rng.uniform(1e4, 1e6, vals.shape)
+        self.data.set_data(vals)
+        
+        #null out rows of condition A where ground truth 1 is true
+        A = self.data.get_A()
+        A[self.h_1[:, np.newaxis]] = np.nan
+        self.data.set_A(A)
+        
+        for step_option in ['50_valid', '50_valid_per_cond']:
+            #process data
+            data = deepcopy(self.data)
+            data = self.pipeline_steps[step_option].process(data)
+            significant = data.get_significance()
+            significant = significant[np.isfinite(significant)]
+            
+            self.sub_test_battery(significant, step_option)
+        
+    def test_unique_peptide_filter(self):
+        #set unique peptide count equal to truth 1
+        df = self.data.get_df()
+        df['n_unique_peptides'] = np.int(self.truth_1)
+        self.data.set_df(df)
+
+        #process data
+        step_option = 'min_1_unique'
+        data = deepcopy(self.data)
+        data = self.pipeline_steps[step_option].process(data)
+        significant = data.get_significance()
+        significant = significant[np.isfinite(significant)]
+        
+        self.sub_test_battery(significant, step_option)
+
+    def test_peptide_count_filter(self):
+        #set valid rows equal to truth 1
+        df = self.data.get_df()
+        df['n_unique_peptides'] = np.int(self.truth_1)
+        df['n_peptides'] = np.int(self.truth_1) + 1    
+        self.data.set_df(df)
+
+        #process data
+        step_option = 'min_1_unique_2_total'
+        data = deepcopy(self.data)
+        data = self.pipeline_steps[step_option].process(data)
+        significant = data.get_significance()
+        significant = significant[np.isfinite(significant)]
+        
+        self.sub_test_battery(significant, step_option)
+        
 
 if __name__ == '__main__':
     import make_test_data

@@ -32,7 +32,9 @@ data[[f'{c}{i}' for c in 'AB' for i in range(N)]] = values
 data.to_csv('data.tsv', sep = '\t')
 metadata = pd.DataFrame({'proteins':[f'protein{i}' for i in range(p_prot)],
                          'truth1':[False]*(p_prot//2) + [True]*(p_prot//2),
-                         'truth2':rng.choice((True, False), p_prot)})
+                         'truth2':rng.choice((True, False), p_prot),
+                         'N_peptides':[2]*p_prot,
+                         'N_unique_peptides':[2]*p_prot})
 metadata.to_csv('metadata.tsv', sep = '\t')
 
 #write lipid data
