@@ -91,6 +91,7 @@ class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
         self.tearDown()
 
     def test_additive_shift(self):
+        #add a linear shift of 15X the mean
         truth = self.data.get_truths()[:,0]
         means = np.nanmean(self.data.get_data(), axis = 1)
         shifts = truth * 15 * means
@@ -116,6 +117,37 @@ class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
                 with self.subTest(f'Does {step_option} have a low FPR?'):
                     self.assertLess(FPR, 0.1)
 
+class MultiplicityCorrectionTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setUp()
+        self.step_options = self.options.step_options['4_multiplicity_correction']
+        self.tearDown()
+
+    def test_multiplicity_correction(self):
+        from DE_analysis_optimizer.pipeline_steps import StudentT
+
+        #add a linear shift of 15X the mean to only the ground-truth significant values
+        truth = self.data.get_truths()[:,0]
+        means = np.nanmean(self.data.get_data(), axis = 1)
+        shifts = truth * 15 * means
+        A = self.data.get_A() + shifts[:,np.newaxis]
+        self.data.set_A(A)
+        #run a student's t-test on the data
+        self.data = StudentT().process(self.data)
+        scores = self.data.get_score()
+        
+        for step_option in self.step_options:
+            #process data
+            data = deepcopy(self.data)
+            data = self.pipeline_steps[step_option].process(data)
+            significant = data.get_significance()
+            score_ratio = np.nanmean(scores[significant])/np.nanmean(scores[np.logical_not(significant)])
+            
+            with self.subTest(f'Do {step_option} significance calls correlate with prob_scores?'):
+                self.assertLess(score_ratio, 1)
+            with self.subTest(f'Does {step_option} handle NANs?'):
+                self.assertTrue(np.any(np.any(np.isfinite(significant))))
 
 if __name__ == '__main__':
     import make_test_data
