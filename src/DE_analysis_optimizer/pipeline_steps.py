@@ -225,6 +225,17 @@ class WelchT(Step):
 # =============================================================================
 # multiplicity correction choices
 # =============================================================================
+class NoCorrection(Step):
+    def __init__(self):
+        self.name = 'no_correction'
+    
+    def process(self, data):
+        data = super().process(data)
+        pvals = data.get_score()
+        significant = pvals < 0.05
+        data.set_significance(significant)
+        return data
+
 class Bonferroni(Step):
     def __init__(self):
         self.name = 'bonferroni'
