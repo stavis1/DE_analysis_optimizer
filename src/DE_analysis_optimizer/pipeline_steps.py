@@ -20,12 +20,15 @@ class Step():
 
 class BaseSummedAbundance(Step):
     def sum_abundance(self, data):
+        #collect necessary data
         df = data.get_df()
         metadata = data.get_metadata()
         metadata.index = metadata['proteins']
         del metadata['proteins']
         metadata_cols = list(metadata.columns)
         quantcols = list(data.A_cols) + list(data.B_cols)
+        
+        #sum by proteins
         proteins = df[['proteins'] + quantcols].groupby('proteins').sum()
         proteins = proteins.merge(metadata, 
                                   how = 'left',
@@ -34,6 +37,7 @@ class BaseSummedAbundance(Step):
         proteins.columns = quantcols + metadata_cols
         proteins['analyte'] = proteins.index
         data.set_df(proteins)
+        data.recalculate_missingness()
         return data
 
 class BaseFilter(Step):
@@ -313,8 +317,8 @@ class MinValid50(BaseFilter):
     
     def process(self, data):
         data = super().process(data)
-        vals = data.get_data()
-        n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
+        vals = data.get_observed()
+        n_missing = np.sum(vals, axis = 1)
         valid = (n_missing/vals.shape[1]) < 0.5
         data = self.significance_filter(data, valid)
         return data
@@ -325,11 +329,11 @@ class MinValid50PerCond(BaseFilter):
     
     def process(self, data):
         data = super().process(data)
-        vals = data.get_A()
-        n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
+        vals = data.get_observed_A()
+        n_missing = np.sum(vals, axis = 1)
         valid = (n_missing/vals.shape[1]) < 0.5
-        vals = data.get_B()
-        n_missing = np.sum(np.logical_not(np.isfinite(vals)), axis = 1)
+        vals = data.get_observed_B()
+        n_missing = np.sum(vals, axis = 1)
         valid = np.logical_and((n_missing/vals.shape[1]) < 0.5, valid)
         data = self.significance_filter(data, valid)
         return data

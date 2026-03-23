@@ -220,6 +220,7 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
         A = self.data.get_A()
         A[np.logical_not(self.truth_1)] = np.nan
         self.data.set_A(A)
+        self.data.recalculate_missingness()
         
         for step_option in ['50_valid', '50_valid_per_cond']:
             #process data

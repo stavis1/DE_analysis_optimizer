@@ -18,6 +18,8 @@ class Data:
         self.data = df
         self.data['prob_score'] = [np.nan]*df.shape[0]
         self.data['is_significant'] = [True]*df.shape[0]
+        self.observed = self.data[self.A_cols + self.B_cols].copy()
+        self.observed[self.A_cols + self.B_cols] = np.logical_not(np.isfinite(self.observed.to_numpy()))
     
     def __hash__(self):
         return hash(self.history)
@@ -45,6 +47,7 @@ class Data:
     
     def prune(self, to_keep):
         self.data = self.data[to_keep]
+        self.observed = self.observed[to_keep]
 
     def get_truths(self):
         return self.data[self.ground_truths].to_numpy()
@@ -73,7 +76,24 @@ class Data:
             self.data['prob_score'] = [np.nan]*self.data.shape[0]
         if not 'is_significant' in list(self.data.columns):
             self.data['is_significant'] = [True]*self.data.shape[0]
+        
     
+    def get_observed(self):
+        return self.observed.to_numpy()
+    
+    def get_observed_A(self):
+        return self.observed[self.A_cols].to_numpy()
+
+    def get_observed_B(self):
+        return self.observed[self.B_cols].to_numpy()
+    
+    def recalculate_missingness(self):
+        quantcols = self.A_cols + self.B_cols
+        self.observed = self.data[quantcols].copy()
+        vals = self.observed.to_numpy()
+        vals = np.logical_not(np.isfinite(vals))
+        self.observed[quantcols] = vals
+        
     def get_metadata(self):
         return self.protein_metadata
 
