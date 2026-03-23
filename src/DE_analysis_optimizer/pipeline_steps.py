@@ -214,8 +214,7 @@ class Bonferroni(Step):
     def process(self, data):
         data = super().process(data)
         pvals = data.get_score()
-        pvals = pvals/len(pvals)
-        significant = pvals < 0.05
+        significant = pvals < (0.05/len(pvals))
         data.set_significance(significant)
         return data
 
