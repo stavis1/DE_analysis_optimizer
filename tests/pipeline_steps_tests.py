@@ -62,6 +62,39 @@ class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
             with self.subTest(f'Does {step_option} correctly drop the proteins column?:'):
                 self.assertTrue('proteins' not in list(data.get_df().columns))
 
+class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setUp()
+        self.step_options = self.options.step_options['3_statistical_test']
+        self.tearDown()
+
+    def test_additive_shift(self):
+        from copy import deepcopy
+        import numpy as np
+        
+        truth = self.data.get_truths[:,0]
+        means = np.nanmean(self.data.get_data(), axis = 1)
+        shifts = truth * 5 * means
+        A = self.data.get_A() + shifts[:,np.newaxis]
+        self.data.set_A(A)
+        
+        for step_option in self.step_options:
+            if step_option not in ['noop']:
+                #process data
+                data = deepcopy(self.data)
+                data = self.pipeline_steps[step_option].process(data)
+                significant = data['prob_score'] < 0.05
+                FP = np.nansum(np.logical_and(significant, np.logical_not(truth)))
+                TN = np.nansum(np.logical_and(np.logical_not(significant), truth))
+                FPR = FP/(FP+TN)
+                
+                with self.subTest(f'Does {step_option} find only true positives?'):
+                    self.assertTrue(all(tp for tp,s in zip(truth, significant) if s))
+                with self.subTest(f'Does {step_option} have a low FPR?'):
+                    self.assertLess(FPR, 0.1)
+
+
 if __name__ == '__main__':
     import make_test_data
     unittest.main()

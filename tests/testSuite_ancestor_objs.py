@@ -46,8 +46,14 @@ class basePipelineStepTestSuite(baseTestSuite):
         for step_option in self.step_options:
             this_data = deepcopy(self.data)
             this_data = self.pipeline_steps[step_option].process(this_data)
+            this_df = this_data.get_df()
             with self.subTest('Can {step_option} handle nan values?'):
                 self.assertTrue(np.any(np.isfinite(this_data.get_data())))
+                if 'prob_score' in this_df.columns:
+                    self.assertTrue(np.any(np.isfinite(this_df['prob_score'])))
+                if 'significant' in this_df.columns:
+                    self.assertTrue(np.any(np.isfinite(this_df['significant'])))
+                
             
 class baseLipidomicsTestSuite(basePipelineStepTestSuite):
     def setUp(self):
