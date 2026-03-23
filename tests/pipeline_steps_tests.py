@@ -172,7 +172,7 @@ class EffectFilterTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite, tes
                     significant[np.logical_and(self.truth, np.logical_not(sig_init))]
                     self.assertTrue(np.all(np.logical_not(subset)))
                                 
-class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite()):
+class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setUp()
@@ -183,8 +183,8 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite()):
         super().setUp(*args, **kwargs)
         from DE_analysis_optimizer.pipeline_steps import UniqueSummedAbundance
         self.data = UniqueSummedAbundance().process(self.data)
-        self.truth_0 = self.data.get_truths[:, 0]
-        self.truth_1 = self.data.get_truths()[:,1]
+        self.truth_0 = self.data.get_truths()[:, 0]
+        self.truth_1 = self.data.get_truths()[:, 1]
         self.data.set_significance(self.truth_0)
 
     
@@ -208,12 +208,12 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite()):
         #remove all missing values
         vals = self.data.get_data()
         mask = np.logical_not(np.isfinite(vals))
-        vals[mask] = self.options.rng.uniform(1e4, 1e6, vals.shape)
+        vals[mask] = self.options.rng.uniform(1e4, 1e6, vals.shape)[mask]
         self.data.set_data(vals)
         
         #null out rows of condition A where ground truth 1 is true
         A = self.data.get_A()
-        A[self.h_1[:, np.newaxis]] = np.nan
+        A[self.truth_1] = np.nan
         self.data.set_A(A)
         
         for step_option in ['50_valid', '50_valid_per_cond']:
@@ -228,7 +228,7 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite()):
     def test_unique_peptide_filter(self):
         #set unique peptide count equal to truth 1
         df = self.data.get_df()
-        df['n_unique_peptides'] = np.int(self.truth_1)
+        df['n_unique_peptides'] = self.truth_1.astype('int')
         self.data.set_df(df)
 
         #process data
@@ -243,8 +243,8 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite()):
     def test_peptide_count_filter(self):
         #set valid rows equal to truth 1
         df = self.data.get_df()
-        df['n_unique_peptides'] = np.int(self.truth_1)
-        df['n_peptides'] = np.int(self.truth_1) + 1    
+        df['n_unique_peptides'] = self.truth_1.astype('int')
+        df['n_peptides'] = self.truth_1 + 1    
         self.data.set_df(df)
 
         #process data
