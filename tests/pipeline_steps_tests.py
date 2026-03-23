@@ -42,6 +42,26 @@ class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
         self.step_options = self.options.step_options['2_protein_rollup']
         self.tearDown()
 
+    def test_protein_rollup_sanity(self):
+        from copy import deepcopy
+        
+        #get reference value
+        max_N_prots = self.data.get_metadata().shape[0]
+        
+        #check each rollup strategy
+        for step_option in self.step_options:
+            #process data
+            data = deepcopy(self.data)
+            data = self.pipeline_steps[step_option].process(data)
+            N_prots = data.get_data().shape[0]
+            
+            with self.subTest(f'Does {step_option} give a sane number of proteins?'):
+                self.assertLessEqual(N_prots, max_N_prots)
+            with self.subTest(f'Does {step_option} correctly label the analytes?'):
+                self.assertTrue(all([a.startswith('protein') for a in data.get_df()['analyte']]))
+            with self.subTest(f'Does {step_option} correctly drop the proteins column?:'):
+                self.assertTrue('proteins' not in list(data.get_df().columns))
+
 if __name__ == '__main__':
     import make_test_data
     unittest.main()

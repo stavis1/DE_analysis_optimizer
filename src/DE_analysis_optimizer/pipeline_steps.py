@@ -23,12 +23,15 @@ class BaseSummedAbundance(Step):
         metadata = data.get_metadata()
         metadata.index = metadata['proteins']
         del metadata['proteins']
+        metadata_cols = list(metadata.columns)
         quantcols = list(data.A_cols) + list(data.B_cols)
         proteins = df[['proteins'] + quantcols].groupby('proteins').sum()
         proteins = proteins.merge(metadata, 
                                   how = 'left',
                                   left_index = True,
                                   right_index = True)
+        proteins.columns = quantcols + metadata_cols
+        proteins['analyte'] = proteins.index
         data.set_df(proteins)
         return data
 
