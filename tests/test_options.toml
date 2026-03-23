@@ -40,7 +40,7 @@ rng_seed = 1
 [step_options]
 1_normalization = ['noop', 'mean_centering', 'log_mean_centering', 'median_centering', 'log_median_centering']
 2_imputation = ['noop', 'zero_fill']
-3_statistical_test = ['noop']
+3_statistical_test = ['student_t']
 4_multiplicity_correction = ['noop']
 5_effect_size_filter = ['noop']
 6_rules_based_filter = ['noop']

@@ -8,6 +8,7 @@ Created on Mon Jan 27 14:55:47 2025
 
 import pandas as pd
 import numpy as np
+import warnings
 
 class Step():
     def __init__(self):
@@ -179,7 +180,23 @@ class ZeroFill(Step):
 # =============================================================================
 # statsitical test choices
 # =============================================================================
-
+class StudentT(Step):
+    def __init__(self):
+        self.name = 'student_t'
+    
+    def process(self, data):
+        data = super().process(data)
+        #run a student's t-test
+        from scipy.stats import ttest_ind
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = ttest_ind(data.get_A(),
+                                data.get_B(),
+                                equal_var = True,
+                                nan_policy = 'omit',
+                                axis = 1)
+        data.set_score(results.pvalue)
+        return data
 
 # =============================================================================
 # multiplicity correction choices
