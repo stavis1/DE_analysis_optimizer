@@ -192,16 +192,21 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
         with self.subTest(f'Does {step_option} handle NANs?'):
             self.assertTrue(len(significant) > 0)
         
+        invalid = np.logical_not(self.truth_1)
+        valid = self.truth_1
+        test_insignificant = np.logical_not(self.truth_0)
+        test_significant = self.truth_0
+        
         with self.subTest(f'Does {step_option} remove invalid analytes?'):
-            subset = significant[self.truth_1]
+            subset = significant[invalid]
             self.assertTrue(np.all(np.logical_not(subset)))
     
         with self.subTest(f'Does {step_option} retain valid analytes?'):
-            subset = significant[np.logical_and(np.logical_not(self.truth_1), self.truth_0)]
+            subset = significant[np.logical_and(valid, test_significant)]
             self.assertTrue(np.all(subset))
     
         with self.subTest(f'Does {step_option} respect negative significance calls?'):
-            subset = significant[np.logical_and(np.logical_not(self.truth_1), self.truth_0)]
+            subset = significant[np.logical_and(valid, test_insignificant)]
             self.assertTrue(np.all(np.logical_not(subset)))
     
     def test_missingness_filters(self):
@@ -228,7 +233,7 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
     def test_unique_peptide_filter(self):
         #set unique peptide count equal to truth 1
         df = self.data.get_df()
-        df['n_unique_peptides'] = self.truth_1.astype('int')
+        df['N_unique_peptides'] = self.truth_1.astype('int')
         self.data.set_df(df)
 
         #process data
@@ -243,8 +248,8 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
     def test_peptide_count_filter(self):
         #set valid rows equal to truth 1
         df = self.data.get_df()
-        df['n_unique_peptides'] = self.truth_1.astype('int')
-        df['n_peptides'] = self.truth_1 + 1    
+        df['N_unique_peptides'] = self.truth_1.astype('int')
+        df['N_peptides'] = self.truth_1 + 1    
         self.data.set_df(df)
 
         #process data
