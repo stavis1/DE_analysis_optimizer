@@ -164,7 +164,17 @@ class QuantileNorm(Step):
 # =============================================================================
 # imputation choices
 # =============================================================================
-
+class ZeroFill(Step):
+    def __init__(self):
+        self.name = 'zero_fill'
+    
+    def process(self, data):
+        data = super().process(data)
+        #replace missing values with zero
+        vals = data.get_data()
+        vals[np.logical_not(np.isfinite(vals))] = 0
+        data.set_data(vals)
+        return data
 
 # =============================================================================
 # statsitical test choices
