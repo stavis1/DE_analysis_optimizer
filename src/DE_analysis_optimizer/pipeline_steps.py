@@ -218,7 +218,7 @@ class Bonferroni(Step):
 # =============================================================================
 class Min2FC(Step):
     def __init__(self):
-        self.name = 'bonferroni'
+        self.name = 'min_FC_2'
     
     def process(self, data):
         data = super().process(data)
