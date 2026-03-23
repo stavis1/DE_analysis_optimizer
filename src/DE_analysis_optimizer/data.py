@@ -77,7 +77,7 @@ class Data:
         if not 'prob_score' in list(self.data.columns):
             self.data['prob_score'] = [np.nan]*self.data.shape[0]
         if not 'is_significant' in list(self.data.columns):
-            self.data['is_significant'] = [True]*self.data.shape[0]
+            self.data['is_significant'] = [np.nan]*self.data.shape[0]
         
     
     def get_observed(self):
