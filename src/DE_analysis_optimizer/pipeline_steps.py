@@ -236,6 +236,21 @@ class Min2FC(BaseFilter):
         data = self.significance_filter(data, valid)
         return data
 
+class Min15FC(BaseFilter):
+    def __init__(self):
+        self.name = 'min_FC_1.5'
+    
+    def process(self, data):
+        data = super().process(data)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            mean_A = np.nanmean(data.get_A(), axis = 1)
+            mean_B = np.nanmean(data.get_B(), axis = 1)
+            l2fc = np.log2(mean_A/mean_B)
+        valid = l2fc >= np.log2(1.5)
+        data = self.significance_filter(data, valid)
+        return data
+
 
 # =============================================================================
 # rules-based filter choices
