@@ -165,11 +165,11 @@ class EffectFilterTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite, tes
                     self.assertTrue(np.all(np.logical_not(subset)))
                 
                 with self.subTest(f'Does {step_option} retain large effect sizes?'):
-                    significant[np.logical_and(self.truth, sig_init)]
+                    subset = significant[np.logical_and(self.truth, sig_init)]
                     self.assertTrue(np.all(subset))
                 
                 with self.subTest(f'Does {step_option} respect negative significance calls?'):
-                    significant[np.logical_and(self.truth, np.logical_not(sig_init))]
+                    subset = significant[np.logical_and(self.truth, np.logical_not(sig_init))]
                     self.assertTrue(np.all(np.logical_not(subset)))
                                 
 class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
