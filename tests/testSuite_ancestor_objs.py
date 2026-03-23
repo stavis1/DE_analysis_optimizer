@@ -48,7 +48,17 @@ class baseDataProcessingStepTestSuite(baseTestSuite):
             this_data = self.pipeline_steps[step_option].process(this_data)
             with self.subTest(f'Can {step_option} handle nan values?'):
                 self.assertTrue(np.any(np.isfinite(this_data.get_data())))
-            
+
+class baseLinearShiftTestSuite(baseTestSuite):
+    def add_linear_shift(self):
+        import numpy as np
+        #add a linear shift of 15X the mean to only the ground-truth significant values
+        self.truth = self.data.get_truths()[:,0]
+        means = np.nanmean(self.data.get_data(), axis = 1)
+        shifts = self.truth * 15 * means
+        A = self.data.get_A() + shifts[:,np.newaxis]
+        self.data.set_A(A)
+
 class baseLipidomicsTestSuite(baseTestSuite):
     def setUp(self):
         super().setUp()
