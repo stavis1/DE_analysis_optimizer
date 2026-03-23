@@ -11,12 +11,14 @@ import testSuite_ancestor_objs
 from copy import deepcopy
 import numpy as np
 
-class NormalizationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
+class NormalizationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite, testSuite_ancestor_objs.baseDataProcessingStepTestSuite):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setUp()
         self.step_options = self.options.step_options['1_normalization']
         self.tearDown()
+        self.check_prob_score = False
+        self.check_significance = False
     
     def test_shift_correction(self):
         A = self.data.get_A()
@@ -33,7 +35,7 @@ class NormalizationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
                 with self.subTest(f'Can {step_option} remove a multiplicative shift?'):
                     self.assertLess(mean_diff, init_mean_diff)
 
-class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
+class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite, testSuite_ancestor_objs.baseDataProcessingStepTestSuite):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setUp()
@@ -58,7 +60,7 @@ class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
             with self.subTest(f'Does {step_option} correctly drop the proteins column?:'):
                 self.assertTrue('proteins' not in list(data.get_df().columns))
 
-class ImputationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
+class ImputationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite, testSuite_ancestor_objs.baseDataProcessingStepTestSuite):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setUp()
@@ -89,7 +91,7 @@ class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
         self.tearDown()
 
     def test_additive_shift(self):
-        truth = self.data.get_truths[:,0]
+        truth = self.data.get_truths()[:,0]
         means = np.nanmean(self.data.get_data(), axis = 1)
         shifts = truth * 5 * means
         A = self.data.get_A() + shifts[:,np.newaxis]
@@ -105,6 +107,8 @@ class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite):
                 TN = np.nansum(np.logical_and(np.logical_not(significant), truth))
                 FPR = FP/(FP+TN)
                 
+                with self.subTest(f'Does {step_option} handle NANs?'):
+                    self.assertTrue(np.any(np.isfinite(significant)))
                 with self.subTest(f'Does {step_option} find only true positives?'):
                     self.assertTrue(all(tp for tp,s in zip(truth, significant) if s))
                 with self.subTest(f'Does {step_option} have a low FPR?'):

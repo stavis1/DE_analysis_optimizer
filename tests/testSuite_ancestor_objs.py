@@ -38,7 +38,7 @@ class baseTestSuite(unittest.TestCase):
         sys.argv = self.init_argv
         pass
 
-class basePipelineStepTestSuite(baseTestSuite):
+class baseDataProcessingStepTestSuite(baseTestSuite):
     def test_nan_support(self):
         from copy import deepcopy
         import numpy as np
@@ -46,22 +46,16 @@ class basePipelineStepTestSuite(baseTestSuite):
         for step_option in self.step_options:
             this_data = deepcopy(self.data)
             this_data = self.pipeline_steps[step_option].process(this_data)
-            this_df = this_data.get_df()
-            with self.subTest('Can {step_option} handle nan values?'):
+            with self.subTest(f'Can {step_option} handle nan values?'):
                 self.assertTrue(np.any(np.isfinite(this_data.get_data())))
-                if 'prob_score' in this_df.columns:
-                    self.assertTrue(np.any(np.isfinite(this_df['prob_score'])))
-                if 'significant' in this_df.columns:
-                    self.assertTrue(np.any(np.isfinite(this_df['significant'])))
-                
             
-class baseLipidomicsTestSuite(basePipelineStepTestSuite):
+class baseLipidomicsTestSuite(baseTestSuite):
     def setUp(self):
         super().setUp()
         self.data = read_data(self.options)
         self.pipeline_steps = get_all_pipeline_steps()
     
-class baseProteomicsTestSuite(basePipelineStepTestSuite):
+class baseProteomicsTestSuite(baseTestSuite):
     def setUp(self):
         super().setUp()
         test_path = os.path.dirname(__name__)
