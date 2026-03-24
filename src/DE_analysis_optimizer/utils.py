@@ -67,8 +67,7 @@ class NewPipelineGenerator():
     def get_new_pipeline(self):
         #read outcomes
         self.pipe.send(Message('get_outcomes', len(self.outcomes)))
-        if self.pipe.poll():
-            self.outcomes.extend(self.pipe.recv())
+        self.outcomes.extend(self.pipe.recv())
         
         #generate new pipeline
         if self.outcomes:
@@ -79,9 +78,7 @@ class NewPipelineGenerator():
         
         #read attempted pipelines
         self.pipe.send(Message('get_attempts', len(self.attempts)))
-        if self.pipe.poll():
-            self.attempts.update(self.pipe.recv())
-            
+        self.attempts.update(self.pipe.recv())
         
         #ensure the new pipeline is unique
         pipeline = mutate(self.options, pipeline, self.attempts, self.all_pipeline_steps)
