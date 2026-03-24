@@ -6,10 +6,15 @@ Created on Mon Jan 27 14:20:40 2025
 @author: 4vt
 """
 
-def init_data_manager(options, pool):
-    from multiprocessing import Pipe
-    from DE_analysis_optimizer.workers import run_data_manager
+from multiprocessing import Pipe
+from DE_analysis_optimizer.workers import run_data_manager
+from DE_analysis_optimizer.genetic_algorithm import get_breeding_population, breed, mutate, random_pipeline
+from DE_analysis_optimizer import pipeline_steps
+import pandas as pd    
+from DE_analysis_optimizer.data import Data
     
+
+def init_data_manager(options, pool):    
     #initialize attempts manager
     manager_ends = []
     optimizer_ends = []
@@ -25,9 +30,6 @@ def read_data(options):
     '''
     Reads in the raw analyte quantities file.
     '''
-    import pandas as pd    
-    from DE_analysis_optimizer.data import Data
-    
     df = pd.read_csv(options.data_file, sep = '\t')
     if options.protein_metadata:
         metadata = pd.read_csv(options.protein_metadata, sep = '\t')
@@ -38,8 +40,6 @@ def read_data(options):
     return data
 
 def get_all_pipeline_steps():
-    from DE_analysis_optimizer import pipeline_steps
-
     #set up a dictionary that maps pipeline step names to their objects
     all_pipeline_steps = {}
     for Step in pipeline_steps.__dict__.values():
@@ -50,3 +50,40 @@ def get_all_pipeline_steps():
     
     return all_pipeline_steps
 
+class Message:
+    def __init__(self, purpose, value):
+        self.purpose = purpose
+        self.value = value
+
+
+class NewPipelineGenerator():
+    def __init__(self, pipe, options):
+        self.options
+        self.all_pipeline_steps = get_all_pipeline_steps()
+        self.outcomes = []
+        self.attempts = set()
+        
+    def get_new_pipeline(self):
+        #read outcomes
+        self.pipe.send(Message('get_outcomes', len(self.outcomes)))
+        if self.pipe.poll():
+            self.outcomes.extend(self.pipe.recv())
+        
+        #generate new pipeline
+        if self.outcomes:
+            self.outcomes = get_breeding_population(self.outcomes)
+            pipeline = breed(self.options, self.outcomes, self.all_pipeline_steps)
+        else:
+            pipeline = random_pipeline(self.options, self.all_pipeline_steps)
+        
+        #read attempted pipelines
+        self.pipe.send(Message('get_attempts', len(self.attempts)))
+        if self.pipe.poll():
+            self.attempts.update(self.pipe.recv())
+        
+        #ensure the new pipeline is unique
+        pipeline = mutate(self.options, pipeline, self.attempts, self.all_pipeline_steps)
+        
+        #write current pipeline to attempted pipelines table
+        attempt = pipeline.attempt_line()
+        self.pipe.send(Message('submit_attempt', attempt))

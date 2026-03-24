@@ -6,11 +6,6 @@ Created on Mon Jan 27 13:36:06 2025
 @author: 4vt
 """
 
-class Message:
-    def __init__(self, purpose, value):
-        self.purpose = purpose
-        self.value = value
-
 def run_optimization_worker(options, initial_data, pipe):
     '''
     There will be one worker process run per core.
@@ -19,36 +14,11 @@ def run_optimization_worker(options, initial_data, pipe):
     '''
     from copy import deepcopy
     import numpy as np
-    from DE_analysis_optimizer.genetic_algorithm import get_breeding_population, breed, mutate, random_pipeline
-    from DE_analysis_optimizer.utils import get_all_pipeline_steps
-    
-    all_pipeline_steps = get_all_pipeline_steps()
-    outcomes = []
-    attempts = set()
+    from DE_analysis_optimizer.utils import NewPipelineGenerator, Message
+
+    generator = NewPipelineGenerator(pipe, options)
     while True:
-        #read outcomes
-        pipe.send(Message('get_outcomes', len(outcomes)))
-        if pipe.poll():
-            outcomes.extend(pipe.recv())
-        
-        #generate new pipeline
-        if outcomes:
-            outcomes = get_breeding_population(outcomes)
-            pipeline = breed(options, outcomes, all_pipeline_steps)
-        else:
-            pipeline = random_pipeline(options, all_pipeline_steps)
-        
-        #read attempted pipelines
-        pipe.send(Message('get_attempts', len(attempts)))
-        if pipe.poll():
-            attempts.update(pipe.recv())
-        
-        #ensure the new pipeline is unique
-        pipeline = mutate(options, pipeline, attempts, all_pipeline_steps)
-        
-        #write current pipeline to attempted pipelines table
-        attempt = pipeline.attempt_line()
-        pipe.send(Message('submit_attempt', attempt))
+        pipeline = generator.get_new_pipeline()
         
         try:
             #set up new working data
