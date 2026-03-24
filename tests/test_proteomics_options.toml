@@ -43,4 +43,4 @@ rng_seed = 1
 4_statistical_test = ['student_t', 'welch_t', 'man_whitney_u']
 5_multiplicity_correction = ['no_correction', 'bonferroni', 'fdr']
 6_effect_size_filter = ['noop', 'min_FC_2', 'min_FC_1.5']
-7_rules_based_filter = ['noop', 'min_1_unique', 'min_1_unique_2_total']
+7_rules_based_filter = ['noop', 'min_1_unique', 'min_1_unique_2_total', '50_valid', '50_valid_per_cond']
