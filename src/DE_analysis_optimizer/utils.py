@@ -58,7 +58,8 @@ class Message:
 
 class NewPipelineGenerator():
     def __init__(self, pipe, options):
-        self.options
+        self.pipe = pipe
+        self.options = options
         self.all_pipeline_steps = get_all_pipeline_steps()
         self.outcomes = []
         self.attempts = set()
@@ -80,6 +81,7 @@ class NewPipelineGenerator():
         self.pipe.send(Message('get_attempts', len(self.attempts)))
         if self.pipe.poll():
             self.attempts.update(self.pipe.recv())
+            
         
         #ensure the new pipeline is unique
         pipeline = mutate(self.options, pipeline, self.attempts, self.all_pipeline_steps)
@@ -87,3 +89,4 @@ class NewPipelineGenerator():
         #write current pipeline to attempted pipelines table
         attempt = pipeline.attempt_line()
         self.pipe.send(Message('submit_attempt', attempt))
+        return pipeline
