@@ -11,8 +11,7 @@ import os
 from multiprocessing import Pool, set_start_method
 
 import testSuite_ancestor_objs
-from DE_analysis_optimizer.utils import read_data, init_data_manager
-from DE_analysis_optimizer.workers import Message
+from DE_analysis_optimizer.utils import read_data, init_data_manager, NewPipelineGenerator, Message
 from DE_analysis_optimizer.pipeline import Outcome
 
 def writer(pipe):
@@ -53,7 +52,31 @@ class utilsTestSuite(testSuite_ancestor_objs.baseTestSuite):
             with open('test_output/outcomes.tsv', 'r') as tsv:
                 text = tsv.readlines()[1]
                 self.assertEqual(text, 'test\t0.1\t0.2\n')
+    
+    def test_race_condition_robustness(self):        
+        with Pool(2) as p:
+            #initialize the manager process for attempts and outcomes data
+            pipe = init_data_manager(self.options, p)[0]
             
+            #initialize two new pipeline generators
+            generators = [NewPipelineGenerator(pipe, self.options) for _ in range(2)]
+            
+            pipeline_strings = []
+            #run these generators in lockstep
+            for i in range(3):
+                #generate pipelines
+                pipelines = [generator.get_new_pipeline() for generator in generators]
+                
+                #generate outcomes
+                outcomes = [Outcome([p.steps[step].name for step in p.step_order], [i/3]*2) for p in pipelines]
+                for outcome in outcomes:
+                    pipeline_strings.append(''.join(outcome.steps))
+                    pipe.send(Message('submit_outcome', outcome))
+            
+            with self.subTest('Are all pipelines unique?'):
+                self.assertEqual(len(set(pipeline_strings)), len(pipeline_strings))
+            with self.subTest('Have all generators recieved attempt updates?'):
+                self.assertTrue(all(generator.attempts for generator in generators))
 
 if __name__ == '__main__':
     import make_test_data
