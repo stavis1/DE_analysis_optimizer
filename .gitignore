@@ -162,6 +162,8 @@ cython_debug/
 #.idea/
 
 !env/*.yml
+!env/de_analysis_optimizer.dockerfile
+!env/requirements.txt
 tests/*
 !tests/*.py
 !tests/*.toml
