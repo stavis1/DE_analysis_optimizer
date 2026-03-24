@@ -33,7 +33,8 @@ def breed(options, breeders, all_pipeline_steps):
     if len(breeders) > 1:
         parent1, parent2 = options.rng.choice(breeders, 2, replace = False)
     else:
-        parent1, parent2 = breeders[0]
+        parent1 = breeders[0]
+        parent2 = breeders[0]
     
     #choose which parent donates a step for each step in the new pipeline
     step_choices = options.rng.choice((0,1), len(parent1.steps))
