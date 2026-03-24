@@ -256,6 +256,42 @@ class WelchT(Step):
         data.set_score(results.pvalue)
         return data
 
+class LogStudentT(Step):
+    def __init__(self):
+        self.name = 'log_student_t'
+    
+    def process(self, data):
+        data = super().process(data)
+        #run a student's t-test
+        from scipy.stats import ttest_ind
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = ttest_ind(np.log2(data.get_A()),
+                                np.log2(data.get_B()),
+                                equal_var = True,
+                                nan_policy = 'omit',
+                                axis = 1)
+        data.set_score(results.pvalue)
+        return data
+
+class LogWelchT(Step):
+    def __init__(self):
+        self.name = 'log_welch_t'
+    
+    def process(self, data):
+        data = super().process(data)
+        #run a student's t-test
+        from scipy.stats import ttest_ind
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            results = ttest_ind(np.log2(data.get_A()),
+                                np.log2(data.get_B()),
+                                equal_var = False,
+                                nan_policy = 'omit',
+                                axis = 1)
+        data.set_score(results.pvalue)
+        return data
+
 class MannWhitneyU(Step):
     def __init__(self):
         self.name = 'man_whitney_u'
