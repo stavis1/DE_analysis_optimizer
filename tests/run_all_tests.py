@@ -5,7 +5,6 @@ Created on Sun Jul  7 17:44:16 2024
 
 @author: anon
 """
-
 import unittest
 from multiprocessing import set_start_method
 from options_tests import *

@@ -8,7 +8,6 @@ Created on Mon Jan 27 14:55:47 2025
 
 import pandas as pd
 import numpy as np
-import warnings
 
 class Step():
     def __init__(self):
@@ -228,13 +227,11 @@ class StudentT(Step):
         data = super().process(data)
         #run a student's t-test
         from scipy.stats import ttest_ind
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            results = ttest_ind(data.get_A(),
-                                data.get_B(),
-                                equal_var = True,
-                                nan_policy = 'omit',
-                                axis = 1)
+        results = ttest_ind(data.get_A(),
+                            data.get_B(),
+                            equal_var = True,
+                            nan_policy = 'omit',
+                            axis = 1)
         data.set_score(results.pvalue)
         return data
 
@@ -246,13 +243,11 @@ class WelchT(Step):
         data = super().process(data)
         #run a student's t-test
         from scipy.stats import ttest_ind
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            results = ttest_ind(data.get_A(),
-                                data.get_B(),
-                                equal_var = False,
-                                nan_policy = 'omit',
-                                axis = 1)
+        results = ttest_ind(data.get_A(),
+                            data.get_B(),
+                            equal_var = False,
+                            nan_policy = 'omit',
+                            axis = 1)
         data.set_score(results.pvalue)
         return data
 
@@ -264,13 +259,11 @@ class LogStudentT(Step):
         data = super().process(data)
         #run a student's t-test
         from scipy.stats import ttest_ind
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            results = ttest_ind(np.log2(data.get_A()),
-                                np.log2(data.get_B()),
-                                equal_var = True,
-                                nan_policy = 'omit',
-                                axis = 1)
+        results = ttest_ind(np.log2(data.get_A()),
+                            np.log2(data.get_B()),
+                            equal_var = True,
+                            nan_policy = 'omit',
+                            axis = 1)
         data.set_score(results.pvalue)
         return data
 
@@ -282,13 +275,11 @@ class LogWelchT(Step):
         data = super().process(data)
         #run a student's t-test
         from scipy.stats import ttest_ind
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            results = ttest_ind(np.log2(data.get_A()),
-                                np.log2(data.get_B()),
-                                equal_var = False,
-                                nan_policy = 'omit',
-                                axis = 1)
+        results = ttest_ind(np.log2(data.get_A()),
+                            np.log2(data.get_B()),
+                            equal_var = False,
+                            nan_policy = 'omit',
+                            axis = 1)
         data.set_score(results.pvalue)
         return data
 
@@ -300,12 +291,10 @@ class MannWhitneyU(Step):
         data = super().process(data)
         #run a student's t-test
         from scipy.stats import mannwhitneyu
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            results = mannwhitneyu(data.get_A(),
-                                   data.get_B(),
-                                   nan_policy = 'omit',
-                                   axis = 1)
+        results = mannwhitneyu(data.get_A(),
+                               data.get_B(),
+                               nan_policy = 'omit',
+                               axis = 1)
         data.set_score(results.pvalue)
         return data
 
@@ -360,11 +349,9 @@ class Min2FC(BaseFilter):
     
     def process(self, data):
         data = super().process(data)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            mean_A = np.nanmean(data.get_A(), axis = 1)
-            mean_B = np.nanmean(data.get_B(), axis = 1)
-            l2fc = np.log2(mean_A/mean_B)
+        mean_A = np.nanmean(data.get_A(), axis = 1)
+        mean_B = np.nanmean(data.get_B(), axis = 1)
+        l2fc = np.log2(mean_A/mean_B)
         valid = l2fc >= np.log2(2)
         data = self.significance_filter(data, valid)
         return data
@@ -375,11 +362,9 @@ class Min15FC(BaseFilter):
     
     def process(self, data):
         data = super().process(data)
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            mean_A = np.nanmean(data.get_A(), axis = 1)
-            mean_B = np.nanmean(data.get_B(), axis = 1)
-            l2fc = np.log2(mean_A/mean_B)
+        mean_A = np.nanmean(data.get_A(), axis = 1)
+        mean_B = np.nanmean(data.get_B(), axis = 1)
+        l2fc = np.log2(mean_A/mean_B)
         valid = l2fc >= np.log2(1.5)
         data = self.significance_filter(data, valid)
         return data
