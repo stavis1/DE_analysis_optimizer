@@ -5,7 +5,7 @@ from DE_analysis_optimizer.options import Options
 options = Options()
 
 from multiprocessing import Pool, set_start_method
-from DE_analysis_optimizer.worker import run_optimization_worker
+from DE_analysis_optimizer.workers import run_optimization_worker
 from DE_analysis_optimizer.utils import read_data, init_data_manager
 
 #parse data
