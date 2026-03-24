@@ -19,7 +19,7 @@ class Data:
         self.data = df
         self.data.index = self.data['analyte']
         self.data['prob_score'] = [np.nan]*df.shape[0]
-        self.data['is_significant'] = [True]*df.shape[0]
+        self.data['is_significant'] = [np.nan]*df.shape[0]
         self.observed = self.data[self.quantcols].copy()
         self.observed[self.quantcols] = np.logical_not(np.isfinite(self.observed.to_numpy()))
     

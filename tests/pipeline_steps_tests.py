@@ -93,7 +93,7 @@ class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite, testSuite_a
     def test_additive_shift(self):        
         self.add_linear_shift()
         for step_option in self.step_options:
-            if step_option not in ['noop']:
+            if step_option not in ['no_test']:
                 #process data
                 data = deepcopy(self.data)
                 data = self.pipeline_steps[step_option].process(data)

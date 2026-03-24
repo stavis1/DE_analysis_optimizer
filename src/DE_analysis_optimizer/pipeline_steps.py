@@ -219,6 +219,15 @@ class Perseus(Step):
 # =============================================================================
 # statsitical test choices
 # =============================================================================
+class no_test(Step):
+    def __init__(self):
+        self.name = 'no_test'
+    
+    def process(self, data):
+        data = super().process(data)
+        data.set_score([0]*data.get_df().shape[0])
+        return data
+
 class StudentT(Step):
     def __init__(self):
         self.name = 'student_t'
