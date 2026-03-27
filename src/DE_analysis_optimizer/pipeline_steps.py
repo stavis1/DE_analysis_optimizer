@@ -307,6 +307,61 @@ class MannWhitneyU(Step):
         data.set_score(results.pvalue)
         return data
 
+class MinEffectTest(Step):
+    def process(self, data):
+        data = super().process(data)
+        from scipy.stats import ttest_ind_from_stats
+        
+        #condition A stats
+        vals = data.get_A()
+        mean_A = np.nanmean(vals, axis = 1)
+        std_A = np.nanstd(vals, axis = 1, ddof = 1)
+        N_A = np.sum(np.isfinite(vals), axis = 1)
+        
+        #condition B stats
+        vals = data.get_B()
+        mean_B = np.nanmean(vals, axis = 1)
+        std_B = np.nanstd(vals, axis = 1, ddof = 1)
+        N_B = np.sum(np.isfinite(vals), axis = 1)
+        
+        #lower bound test
+        lower_bound = mean_B - mean_B/self.fc_bound
+        p_lower = ttest_ind_from_stats(mean1 = mean_A + lower_bound, 
+                                       std1 = std_A, 
+                                       nobs1 = N_A, 
+                                       mean2 = mean_B, 
+                                       std2 = std_B, 
+                                       nobs2 = N_B,
+                                       equal_var = False,
+                                       alternative = 'less').pvalue
+        
+        #upper bound test
+        upper_bound = mean_B*self.fc_bound - mean_B
+        p_upper = ttest_ind_from_stats(mean1 = mean_A - upper_bound, 
+                                       std1 = std_A, 
+                                       nobs1 = N_A, 
+                                       mean2 = mean_B, 
+                                       std2 = std_B, 
+                                       nobs2 = N_B,
+                                       equal_var = False,
+                                       alternative = 'greater').pvalue
+        
+        #merge
+        pvalue = np.nanmin([p_lower, p_upper], axis = 0)
+        data.set_score(pvalue)
+        return data
+
+class MinEffect1_5(MinEffectTest):
+    def __init__(self):
+        self.name = 'minimum_effect_test_1.5FC'
+        self.fc_bound = 1.5
+        
+class MinEffect2(MinEffectTest):
+    def __init__(self):
+        self.name = 'minimum_effect_test_2FC'
+        self.fc_bound = 2
+        
+
 # =============================================================================
 # multiplicity correction choices
 # =============================================================================
