@@ -50,7 +50,9 @@ class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite, te
         for step_option in self.step_options:
             #process data
             data = deepcopy(self.data)
-            data = self.pipeline_steps[step_option].process(data)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                data = self.pipeline_steps[step_option].process(data)
             N_prots = data.get_data().shape[0]
             
             with self.subTest(f'Does {step_option} give a sane number of proteins?'):
@@ -184,7 +186,9 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
     def setUp(self, *args, **kwargs):
         super().setUp(*args, **kwargs)
         from DE_analysis_optimizer.pipeline_steps import SummedAbundance
-        self.data = SummedAbundance(self.options).process(self.data)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.data = SummedAbundance(self.options).process(self.data)
         self.truth_0 = self.data.get_truths()[:, 0]
         self.truth_1 = self.data.get_truths()[:, 1]
         self.data.set_significance(self.truth_0)

@@ -113,6 +113,20 @@ class SummedAbundance(BaseAbundance):
         data = self.process_abundance(data)
         return data
 
+class MeanAbundance(BaseAbundance):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'mean_abundance'
+    
+    def rollup_func(self, rows, *args, **kwargs):
+        return pd.Series(np.nanmean(rows, axis = 0))
+    
+    def process(self, data):        
+        data = super().process(data)
+        data = self.duplicate_nonunique(data)
+        data = self.process_abundance(data)
+        return data
+
 # =============================================================================
 # normalization choices
 # =============================================================================
