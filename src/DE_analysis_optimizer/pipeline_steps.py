@@ -127,6 +127,27 @@ class MeanAbundance(BaseAbundance):
         data = self.process_abundance(data)
         return data
 
+class MeanZScore(BaseAbundance):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'mean_z_score'
+    
+    def rollup_func(self, rows, *args, **kwargs):
+        return pd.Series(np.nanmean(rows, axis = 0))
+    
+    def process(self, data):        
+        data = super().process(data)
+
+        vals = data.get_data()
+        means = np.nanmean(vals, axis = 1)
+        stds = np.nanstd(vals, axis = 1)
+        vals = (vals - means[:, np.newaxis])/stds[:, np.newaxis]
+        data.set_data(vals)
+
+        data = self.duplicate_nonunique(data)
+        data = self.process_abundance(data)
+        return data
+    
 class MedianAbundance(BaseAbundance):
     def __init__(self, *args):
         super().__init__(*args)
