@@ -18,8 +18,25 @@ class Step():
         data.history += self.name
         return data
 
-class BaseSummedAbundance(Step):
-    def sum_abundance(self, data):
+class BaseAbundance(Step):
+    def duplicate_nonunique(self, data):
+        from copy import copy
+
+        df = data.get_df()
+        dup_rows = []
+        nonunique = [';' in pr for pr in data.get_proteins()]
+        for _, row in df[nonunique].iterrows():
+            prots = row['proteins'].split(';')
+            for prot in prots:
+                newrow = copy(row)
+                newrow['proteins'] = prot
+                dup_rows.append(newrow)
+        df = df[[';' not in pr for pr in data.get_proteins()]]
+        df = pd.concat([df] + dup_rows)
+        data.set_df(df)
+        return data 
+    
+    def process_abundance(self, data):
         #collect necessary data
         df = data.get_df()
         metadata = data.get_metadata()
@@ -28,8 +45,9 @@ class BaseSummedAbundance(Step):
         metadata_cols = list(metadata.columns)
         quantcols = list(data.A_cols) + list(data.B_cols)
         
-        #sum by proteins
-        proteins = df[['proteins'] + quantcols].groupby('proteins').sum()
+        #merge by proteins
+        proteins = df.groupby('proteins')[quantcols].apply(self.rollup_func)
+        proteins.columns = quantcols
         proteins = proteins.merge(metadata, 
                                   how = 'left',
                                   left_index = True,
@@ -63,43 +81,36 @@ class Noop(Step):
         return data
 
 # =============================================================================
-# protein rollup choices
+# peptide filter choices
 # =============================================================================
 
-class UniqueSummedAbundance(BaseSummedAbundance):
+class UniquePeptides(Step):
     def __init__(self, *args):
         super().__init__(*args)
-        self.name = 'unique_summed_abundance'
+        self.name = 'unique_peptides'
     
     def process(self, data):
         data = super().process(data)
         good_peps = [';' not in pr for pr in data.get_proteins()]
         data.prune(good_peps)
-        data = self.sum_abundance(data)
         return data
-        
-class AllSummedAbundance(BaseSummedAbundance):
+
+# =============================================================================
+# protein rollup choices
+# =============================================================================
+
+class SummedAbundance(BaseAbundance):
     def __init__(self, *args):
         super().__init__(*args)
-        self.name = 'all_summed_abundance'
+        self.name = 'summed_abundance'
     
-    def process(self, data):
-        from copy import copy
-        
+    def rollup_func(self, rows, *args, **kwargs):
+        return pd.Series(np.nansum(rows, axis = 0))
+    
+    def process(self, data):        
         data = super().process(data)
-        df = data.get_df()
-        dup_rows = []
-        nonunique = [';' in pr for pr in data.get_proteins()]
-        for _, row in df[nonunique].iterrows():
-            prots = row['proteins'].split(';')
-            for prot in prots:
-                newrow = copy(row)
-                newrow['proteins'] = prot
-                dup_rows.append(newrow)
-        df = df[[';' not in pr for pr in data.get_proteins()]]
-        df = pd.concat([df] + dup_rows)
-        data.set_df(df)
-        data = self.sum_abundance(data)
+        data = self.duplicate_nonunique(data)
+        data = self.process_abundance(data)
         return data
 
 # =============================================================================
@@ -181,7 +192,7 @@ class QuantileNorm(Step):
         mask = np.isfinite(vals)
         vals[mask] = np.nanquantile(allvals, vals[mask])
         data.set_data(vals)
-        return data
+        return data        
 
 # =============================================================================
 # imputation choices

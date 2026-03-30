@@ -39,7 +39,7 @@ class ProteinRollupTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite, te
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setUp()
-        self.step_options = self.options.step_options['2_protein_rollup']
+        self.step_options = self.options.step_options['3_protein_rollup']
         self.tearDown()
 
     def test_protein_rollup_sanity(self):        
@@ -178,13 +178,13 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setUp()
-        self.step_options = self.options.step_options['7_rules_based_filter']
+        self.step_options = self.options.step_options['8_rules_based_filter']
         self.tearDown()
 
     def setUp(self, *args, **kwargs):
         super().setUp(*args, **kwargs)
-        from DE_analysis_optimizer.pipeline_steps import UniqueSummedAbundance
-        self.data = UniqueSummedAbundance(self.options).process(self.data)
+        from DE_analysis_optimizer.pipeline_steps import SummedAbundance
+        self.data = SummedAbundance(self.options).process(self.data)
         self.truth_0 = self.data.get_truths()[:, 0]
         self.truth_1 = self.data.get_truths()[:, 1]
         self.data.set_significance(self.truth_0)
