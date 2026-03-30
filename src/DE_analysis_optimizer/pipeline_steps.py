@@ -10,8 +10,9 @@ import pandas as pd
 import numpy as np
 
 class Step():
-    def __init__(self):
+    def __init__(self, options):
         self.name = NotImplemented
+        self.options = options
 
     def process(self, data):
         data.history += self.name
@@ -53,7 +54,8 @@ class BaseFilter(Step):
         return data
 
 class Noop(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'noop'
     
     def process(self, data):
@@ -65,7 +67,8 @@ class Noop(Step):
 # =============================================================================
 
 class UniqueSummedAbundance(BaseSummedAbundance):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'unique_summed_abundance'
     
     def process(self, data):
@@ -76,7 +79,8 @@ class UniqueSummedAbundance(BaseSummedAbundance):
         return data
         
 class AllSummedAbundance(BaseSummedAbundance):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'all_summed_abundance'
     
     def process(self, data):
@@ -103,7 +107,8 @@ class AllSummedAbundance(BaseSummedAbundance):
 # =============================================================================
 
 class MeanCenter(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'mean_centering'
     
     def process(self, data):
@@ -116,7 +121,8 @@ class MeanCenter(Step):
         return data
 
 class LogMeanCenter(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'log_mean_centering'
     
     def process(self, data):
@@ -131,7 +137,8 @@ class LogMeanCenter(Step):
         return data
 
 class MedianCenter(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'median_centering'
     
     def process(self, data):
@@ -144,7 +151,8 @@ class MedianCenter(Step):
         return data
 
 class LogMedianCenter(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'log_median_centering'
     
     def process(self, data):
@@ -159,7 +167,8 @@ class LogMedianCenter(Step):
         return data
 
 class QuantileNorm(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'quantile_norm'
     
     def process(self, data):
@@ -178,7 +187,8 @@ class QuantileNorm(Step):
 # imputation choices
 # =============================================================================
 class ZeroFill(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'zero_fill'
     
     def process(self, data):
@@ -190,11 +200,11 @@ class ZeroFill(Step):
         return data
 
 class Perseus(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'perseus'
     
     def process(self, data):
-        rng = np.random.default_rng(1)
         data = super().process(data)
         #transform
         vals = data.get_data()
@@ -208,7 +218,7 @@ class Perseus(Step):
         
         #impute
         mask = np.logical_not(np.isfinite(vals))
-        vals[mask] = rng.normal(impute_mean, impute_std, vals.shape)[mask]
+        vals[mask] = self.options.rng.normal(impute_mean, impute_std, vals.shape)[mask]
         
         #back-transform
         vals = np.exp2(vals)
@@ -220,7 +230,8 @@ class Perseus(Step):
 # statsitical test choices
 # =============================================================================
 class no_test(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'no_test'
     
     def process(self, data):
@@ -229,7 +240,8 @@ class no_test(Step):
         return data
 
 class StudentT(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'student_t'
     
     def process(self, data):
@@ -245,7 +257,8 @@ class StudentT(Step):
         return data
 
 class WelchT(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'welch_t'
     
     def process(self, data):
@@ -260,20 +273,9 @@ class WelchT(Step):
         data.set_score(results.pvalue)
         return data
 
-
-class BootT(Step):
-    def __init__(self):
-        self.name = 'bootstrap_t'
-    
-    def process(self, data):
-        data = super().process(data)
-        #run a student's t-test
-        from scipy.stats import bootstrap
-        
-        return data
-
 class LogStudentT(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'log_student_t'
     
     def process(self, data):
@@ -289,7 +291,8 @@ class LogStudentT(Step):
         return data
 
 class LogWelchT(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'log_welch_t'
     
     def process(self, data):
@@ -305,7 +308,8 @@ class LogWelchT(Step):
         return data
 
 class MannWhitneyU(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'man_whitney_u'
     
     def process(self, data):
@@ -345,21 +349,67 @@ class MinEffectTest(Step):
         return data
 
 class MinEffect1_5(MinEffectTest):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'minimum_effect_test_1.5FC'
         self.fc_bound = 1.5
         
 class MinEffect2(MinEffectTest):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'minimum_effect_test_2FC'
         self.fc_bound = 2
+
+class BootMinEffectTest(Step):
+    def process(self, data):
+        A = data.get_A()
+        B = data.get_B()
+        mean_B = np.nanmean(B, axis = 1)
+        lower_bound = -(mean_B/self.fc_bound)
+        upper_bound = mean_B*self.fc_bound - mean_B
+
+        def l2fc(a, b):
+            return np.log2(np.nanmean(a, axis = 1)/np.nanmean(b, axis = 1))
+
+        observed = l2fc(A, B)
+
+        resamps = 10000
+        def sample(a, b, offset, direction):
+            N_a = a.shape[1]
+            vals = np.concatenate((a, b), axis = 1)
+            vals = self.options.rng.choice(vals, (vals.shape[1], resamps), axis = 1)
+            a = vals[:, :N_a, :]
+            b = vals[:, N_a:, :]
+            a = a + offset[:, np.newaxis, np.newaxis]
+            fc = l2fc(a, b) * direction
+            lesser = np.sum(observed[:, np.newaxis] <= fc, axis = 1)
+            pvals = (lesser + 1)/(resamps  + 1)
+            return pvals
+
+        plow = sample(A, B, lower_bound, -1)
+        phigh = sample(A, B, upper_bound, 1)
+        pvals = np.nanmin((plow, phigh), axis = 0)
+        data.set_score(pvals)
+        return data
+    
+class BootMinEffect1_5(BootMinEffectTest):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'bootstrap_minimum_effect_test_1.5FC'
+        self.fc_bound = 1.5
         
+class BootMinEffect2(BootMinEffectTest):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'bootstrap_minimum_effect_test_2FC'
+        self.fc_bound = 2
 
 # =============================================================================
 # multiplicity correction choices
 # =============================================================================
 class NoCorrection(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'no_correction'
     
     def process(self, data):
@@ -370,7 +420,8 @@ class NoCorrection(Step):
         return data
 
 class Bonferroni(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'bonferroni'
     
     def process(self, data):
@@ -383,7 +434,8 @@ class Bonferroni(Step):
         return data
 
 class FDR(Step):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'fdr'
 
     def process(self, data):
@@ -401,7 +453,8 @@ class FDR(Step):
 # effect size filter choices
 # =============================================================================
 class Min2FC(BaseFilter):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'min_FC_2'
     
     def process(self, data):
@@ -414,7 +467,8 @@ class Min2FC(BaseFilter):
         return data
 
 class Min15FC(BaseFilter):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'min_FC_1.5'
     
     def process(self, data):
@@ -430,7 +484,8 @@ class Min15FC(BaseFilter):
 # rules-based filter choices
 # =============================================================================
 class MinValid50(BaseFilter):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = '50_valid'
     
     def process(self, data):
@@ -442,7 +497,8 @@ class MinValid50(BaseFilter):
         return data
 
 class MinValid50PerCond(BaseFilter):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = '50_valid_per_cond'
     
     def process(self, data):
@@ -457,7 +513,8 @@ class MinValid50PerCond(BaseFilter):
         return data
 
 class Min1Unique(BaseFilter):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'min_1_unique'
     
     def process(self, data):
@@ -468,12 +525,13 @@ class Min1Unique(BaseFilter):
         return data
 
 class Min1Unique2Total(BaseFilter):
-    def __init__(self):
+    def __init__(self, *args):
+        super().__init__(*args)
         self.name = 'min_1_unique_2_total'
     
     def process(self, data):
         data = super().process(data)
-        data = Min1Unique().process(data)
+        data = Min1Unique(self.options).process(data)
         df = data.get_df()
         valid = df['N_peptides'] >= 2
         data = self.significance_filter(data, valid)

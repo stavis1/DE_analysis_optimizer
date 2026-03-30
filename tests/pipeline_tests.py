@@ -21,7 +21,7 @@ class pipelineTestSuite(testSuite_ancestor_objs.baseTestSuite):
         
         pipeline.add_step(DummyStep(), '1_normalization')
         for step in self.options.step_order[1:]:
-            pipeline.add_step(Noop(), step)
+            pipeline.add_step(Noop(self.options), step)
         attempt = pipeline.attempt_line()
         self.assertEqual(attempt, ''.join(['test']+['noop']*(len(self.options.step_order)-1)))
     
@@ -40,7 +40,7 @@ class pipelineTestSuite(testSuite_ancestor_objs.baseTestSuite):
         
         pipeline.add_step(DummyStep(), '1_normalization')
         for step in self.options.step_order[1:]:
-            pipeline.add_step(Noop(), step)
+            pipeline.add_step(Noop(self.options), step)
         data = read_data(self.options)
         scores_init = data.get_score()
         significant_init = data.get_significance()

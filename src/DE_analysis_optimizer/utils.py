@@ -39,12 +39,12 @@ def read_data(options):
     
     return data
 
-def get_all_pipeline_steps():
+def get_all_pipeline_steps(options):
     #set up a dictionary that maps pipeline step names to their objects
     all_pipeline_steps = {}
     for Step in pipeline_steps.__dict__.values():
         if type(Step) == type:
-            step = Step()
+            step = Step(options)
             if hasattr(step, 'name') and type(step.name) == str:
                 all_pipeline_steps[step.name] = step
     
@@ -60,7 +60,7 @@ class NewPipelineGenerator():
     def __init__(self, pipe, options):
         self.pipe = pipe
         self.options = options
-        self.all_pipeline_steps = get_all_pipeline_steps()
+        self.all_pipeline_steps = get_all_pipeline_steps(options)
         self.outcomes = []
         self.attempts = set()
         

@@ -28,7 +28,7 @@ class workersTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
             
             #run parallel worker loops
             p.starmap_async(run_optimization_worker, jobs)
-            time.sleep(2)
+            time.sleep(5)
             p.terminate()
         
         
@@ -45,6 +45,8 @@ class workersTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
         with self.subTest('Were all metrics non-NAN at least once?'):
             metric_cols = [c for c in outcomes.columns if c.startswith('truth')]
             self.assertTrue(all(np.any(np.isfinite(outcomes[c])) for c in metric_cols))
+        
+        outcomes.to_csv('tmp_outcomes')
 
 if __name__ == '__main__':
     import make_test_data

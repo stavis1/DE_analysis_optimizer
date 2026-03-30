@@ -63,7 +63,7 @@ class baseLipidomicsTestSuite(baseTestSuite):
     def setUp(self):
         super().setUp()
         self.data = read_data(self.options)
-        self.pipeline_steps = get_all_pipeline_steps()
+        self.pipeline_steps = get_all_pipeline_steps(self.options)
     
 class baseProteomicsTestSuite(baseTestSuite):
     def setUp(self):
@@ -72,7 +72,7 @@ class baseProteomicsTestSuite(baseTestSuite):
         sys.argv = [sys.argv[0], '--options', os.path.join(test_path, 'test_proteomics_options.toml')]
         self.options = Options()
         self.data = read_data(self.options)
-        self.pipeline_steps = get_all_pipeline_steps()
+        self.pipeline_steps = get_all_pipeline_steps(self.options)
 
 
 

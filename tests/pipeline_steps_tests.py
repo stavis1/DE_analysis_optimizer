@@ -5,7 +5,7 @@ Created on Fri Mar 20 15:58:24 2026
 
 @author: chemod-u02
 """
-
+import warnings
 import unittest
 import testSuite_ancestor_objs
 from copy import deepcopy
@@ -90,13 +90,15 @@ class NHSTTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite, testSuite_a
         self.step_options = self.options.step_options['3_statistical_test']
         self.tearDown()
 
-    def test_additive_shift(self):        
+    def test_additive_shift(self):  
         self.add_linear_shift()
         for step_option in self.step_options:
             if step_option not in ['no_test']:
                 #process data
                 data = deepcopy(self.data)
-                data = self.pipeline_steps[step_option].process(data)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    data = self.pipeline_steps[step_option].process(data)
                 significant = data.get_score() < 0.05
                 TP = np.nansum(np.logical_and(significant, self.truth))
                 FP = np.nansum(np.logical_and(significant, np.logical_not(self.truth)))
@@ -122,7 +124,7 @@ class MultiplicityCorrectionTestSuite(testSuite_ancestor_objs.baseLipidomicsTest
         self.add_linear_shift()
         #run a student's t-test on the data
         from DE_analysis_optimizer.pipeline_steps import StudentT
-        self.data = StudentT().process(self.data)
+        self.data = StudentT(self.options).process(self.data)
         scores = self.data.get_score()
         
         for step_option in self.step_options:
@@ -182,7 +184,7 @@ class RulesFilterTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
     def setUp(self, *args, **kwargs):
         super().setUp(*args, **kwargs)
         from DE_analysis_optimizer.pipeline_steps import UniqueSummedAbundance
-        self.data = UniqueSummedAbundance().process(self.data)
+        self.data = UniqueSummedAbundance(self.options).process(self.data)
         self.truth_0 = self.data.get_truths()[:, 0]
         self.truth_1 = self.data.get_truths()[:, 1]
         self.data.set_significance(self.truth_0)

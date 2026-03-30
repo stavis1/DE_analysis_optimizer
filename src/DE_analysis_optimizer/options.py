@@ -79,7 +79,7 @@ class Options:
             raise InputError('The specified data file could not be found.')
         
         #make sure the pipeline options are nonempty and contain real steps
-        defined_steps = set(o().name for o in pipeline_steps.__dict__.values() if hasattr(o, 'process'))
+        defined_steps = set(o(None).name for o in pipeline_steps.__dict__.values() if hasattr(o, 'process'))
         for step in self.step_options.keys():
             if not self.step_options[step]:
                 raise InputError(f'The pipeline step {step} is empty.')
