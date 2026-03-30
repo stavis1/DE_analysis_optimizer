@@ -54,6 +54,7 @@ class Pipeline:
             fp = np.nansum(np.logical_and(significant[:,np.newaxis], np.logical_not(truths)), axis = 0)
             fn = np.nansum(np.logical_and(np.logical_not(significant)[:,np.newaxis], truths), axis = 0)
             PPVs = tp/(fp+tp)
+            PPVs[fp+tp == 0] = 0
             recalls = tp/(fn+tp)
             for PPV, recall in zip(PPVs, recalls):
                 self.results.append(recall)
