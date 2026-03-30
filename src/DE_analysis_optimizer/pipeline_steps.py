@@ -260,6 +260,18 @@ class WelchT(Step):
         data.set_score(results.pvalue)
         return data
 
+
+class BootT(Step):
+    def __init__(self):
+        self.name = 'bootstrap_t'
+    
+    def process(self, data):
+        data = super().process(data)
+        #run a student's t-test
+        from scipy.stats import bootstrap
+        
+        return data
+
 class LogStudentT(Step):
     def __init__(self):
         self.name = 'log_student_t'
@@ -310,45 +322,26 @@ class MannWhitneyU(Step):
 class MinEffectTest(Step):
     def process(self, data):
         data = super().process(data)
-        from scipy.stats import ttest_ind_from_stats
-        
-        #condition A stats
-        vals = data.get_A()
-        mean_A = np.nanmean(vals, axis = 1)
-        std_A = np.nanstd(vals, axis = 1, ddof = 1)
-        N_A = np.sum(np.isfinite(vals), axis = 1)
-        
-        #condition B stats
-        vals = data.get_B()
-        mean_B = np.nanmean(vals, axis = 1)
-        std_B = np.nanstd(vals, axis = 1, ddof = 1)
-        N_B = np.sum(np.isfinite(vals), axis = 1)
-        
-        #lower bound test
-        lower_bound = mean_B - mean_B/self.fc_bound
-        p_lower = ttest_ind_from_stats(mean1 = mean_A + lower_bound, 
-                                       std1 = std_A, 
-                                       nobs1 = N_A, 
-                                       mean2 = mean_B, 
-                                       std2 = std_B, 
-                                       nobs2 = N_B,
-                                       equal_var = False,
-                                       alternative = 'less').pvalue
-        
-        #upper bound test
+        from statsmodels.stats.weightstats import ttost_ind
+        A = data.get_A()
+        B = data.get_B()
+        mean_B = np.nanmean(B, axis = 1)
+        lower_bound = -(mean_B/self.fc_bound)
         upper_bound = mean_B*self.fc_bound - mean_B
-        p_upper = ttest_ind_from_stats(mean1 = mean_A - upper_bound, 
-                                       std1 = std_A, 
-                                       nobs1 = N_A, 
-                                       mean2 = mean_B, 
-                                       std2 = std_B, 
-                                       nobs2 = N_B,
-                                       equal_var = False,
-                                       alternative = 'greater').pvalue
         
-        #merge
-        pvalue = np.nanmin([p_lower, p_upper], axis = 0)
-        data.set_score(pvalue)
+        def tost(a, b, lb, ub):
+            a = a[np.isfinite(a)]
+            b = b[np.isfinite(b)]
+            results = ttost_ind(x1 = a, 
+                                x2 = b, 
+                                low = lb, 
+                                upp = ub,
+                                usevar = 'unequal')
+            pval = np.nanmax((results[1][1], results[2][1]))
+            return 1 - pval
+        
+        pvals = [tost(A[i, :], B[i, :], b[0], b[1]) for i,b in enumerate(zip(lower_bound, upper_bound))]
+        data.set_score(pvals)
         return data
 
 class MinEffect1_5(MinEffectTest):
