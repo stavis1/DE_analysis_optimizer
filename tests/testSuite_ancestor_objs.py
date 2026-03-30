@@ -5,7 +5,7 @@ Created on Sun Jul  7 17:33:28 2024
 
 @author: anon
 """
-
+import warnings
 import sys
 import os
 import unittest
@@ -45,7 +45,9 @@ class baseDataProcessingStepTestSuite(baseTestSuite):
         
         for step_option in self.step_options:
             this_data = deepcopy(self.data)
-            this_data = self.pipeline_steps[step_option].process(this_data)
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                this_data = self.pipeline_steps[step_option].process(this_data)
             with self.subTest(f'Can {step_option} handle nan values?'):
                 self.assertTrue(np.any(np.isfinite(this_data.get_data())))
 
