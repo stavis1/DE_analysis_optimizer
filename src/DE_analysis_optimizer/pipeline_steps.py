@@ -238,6 +238,37 @@ class no_test(Step):
         data = super().process(data)
         data.set_score([0]*data.get_df().shape[0])
         return data
+    
+class Bootstrap(Step):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'bootstrap'
+    
+    def process(self, data):
+        A = data.get_A()
+        B = data.get_B()
+
+        def l2fc(a, b):
+            return np.log2(np.nanmean(a, axis = 1)/np.nanmean(b, axis = 1))
+
+        observed = l2fc(A, B)
+
+        resamps = 10000
+        def sample(a, b):
+            N_a = a.shape[1]
+            vals = np.concatenate((a, b), axis = 1)
+            vals = self.options.rng.choice(vals, (vals.shape[1], resamps), axis = 1)
+            a = vals[:, :N_a, :]
+            b = vals[:, N_a:, :]
+            fc = np.abs(l2fc(a, b))
+            lesser = np.sum(np.abs(observed[:, np.newaxis]) <= fc, axis = 1)
+            pvals = (lesser + 1)/(resamps  + 1)
+            return pvals
+
+        pvals = sample(A, B)
+        data.set_score(pvals)
+        return data
+
 
 class StudentT(Step):
     def __init__(self, *args):

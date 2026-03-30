@@ -40,7 +40,7 @@ rng_seed = 1
 [step_options]
 1_normalization = ['noop', 'mean_centering', 'log_mean_centering', 'median_centering', 'log_median_centering', 'quantile_norm']
 2_imputation = ['noop', 'zero_fill', 'perseus']
-3_statistical_test = ['no_test', 'student_t', 'welch_t', 'log_student_t', 'log_welch_t', 'man_whitney_u', 'minimum_effect_test_1.5FC', 'minimum_effect_test_2FC', 'bootstrap_minimum_effect_test_1.5FC', 'bootstrap_minimum_effect_test_2FC']
+3_statistical_test = ['no_test', 'bootstrap', 'student_t', 'welch_t', 'log_student_t', 'log_welch_t', 'man_whitney_u', 'minimum_effect_test_1.5FC', 'minimum_effect_test_2FC', 'bootstrap_minimum_effect_test_1.5FC', 'bootstrap_minimum_effect_test_2FC']
 4_multiplicity_correction = ['no_correction', 'bonferroni', 'fdr']
 5_effect_size_filter = ['noop', 'min_FC_2', 'min_FC_1.5']
 6_rules_based_filter = ['noop', 'min_1_unique', 'min_1_unique_2_total', '50_valid', '50_valid_per_cond']
