@@ -284,7 +284,19 @@ class Perseus(Step):
         vals = np.exp2(vals)
         data.set_data(vals)
         return data
-        
+
+class KNN(Step):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'KNN_impute'
+    
+    def process(self, data):
+        data = super().process(data)
+        from sklearn.impute import KNNImputer
+        vals = data.get_data()
+        vals = KNNImputer().fit_transform(vals)
+        data.set_data(vals)
+        return data
 
 # =============================================================================
 # statsitical test choices
