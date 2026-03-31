@@ -12,5 +12,8 @@ dependencies:
 - spyder
 - statsmodels
 - scikit-learn
+- tqdm
+- lightgbm
 - pip:
+  - missforest
   - --editable=git+https://github.com/stavis1/DE_analysis_optimizer.git#egg=DE_analysis_optimizer

@@ -77,7 +77,9 @@ class ImputationTestSuite(testSuite_ancestor_objs.baseLipidomicsTestSuite, testS
             if step_option not in ['noop']:
                 #process data
                 data = deepcopy(self.data)
-                data = self.pipeline_steps[step_option].process(data)
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    data = self.pipeline_steps[step_option].process(data)
                 N_missing = np.sum(np.logical_not(np.isfinite(data.get_data())))
                 
                 with self.subTest(f'Does {step_option} reduce the number of NANs?'):

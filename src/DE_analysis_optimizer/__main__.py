@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 from DE_analysis_optimizer.options import Options
 options = Options()
 
 from multiprocessing import Pool, set_start_method
 from DE_analysis_optimizer.workers import run_optimization_worker
 from DE_analysis_optimizer.utils import read_data, init_data_manager
+
+#silence TQDM to clean up logs
+os.environ["TQDM_DISABLE"] = "True"
 
 #parse data
 initial_data = read_data(options)

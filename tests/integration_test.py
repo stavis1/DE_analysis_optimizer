@@ -5,6 +5,7 @@ Created on Fri Mar 20 12:18:53 2026
 
 @author: chemod-u02
 """
+import os
 import unittest
 from multiprocessing import Pool, set_start_method
 import time
@@ -13,6 +14,8 @@ import numpy as np
 import testSuite_ancestor_objs
 from DE_analysis_optimizer.workers import run_optimization_worker
 from DE_analysis_optimizer.utils import read_data, init_data_manager
+
+os.environ["TQDM_DISABLE"] = "True"
 
 class workersTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
     def test_integration(self):
@@ -28,7 +31,7 @@ class workersTestSuite(testSuite_ancestor_objs.baseProteomicsTestSuite):
             
             #run parallel worker loops
             p.starmap_async(run_optimization_worker, jobs)
-            time.sleep(5)
+            time.sleep(240)
             p.terminate()
         
         

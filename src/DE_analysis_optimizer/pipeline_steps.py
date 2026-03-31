@@ -311,6 +311,21 @@ class MeanImpute(Step):
         data.set_data(vals)
         return data
 
+class MissForest(Step):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'missForest'
+    
+    def process(self, data):
+        data = super().process(data)
+        from missforest import MissForest
+        from sklearn.ensemble import RandomForestRegressor
+        vals = data.get_df()
+        mf = MissForest(rgr=RandomForestRegressor(n_jobs = 1))
+        vals[data.quantcols] = mf.fit(vals[data.quantcols].T).transform(vals[data.quantcols].T).T
+        data.set_df(vals)
+        return data
+
 # =============================================================================
 # statsitical test choices
 # =============================================================================
