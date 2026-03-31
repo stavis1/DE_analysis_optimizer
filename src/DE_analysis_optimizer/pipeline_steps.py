@@ -259,6 +259,19 @@ class ZeroFill(Step):
         data.set_data(vals)
         return data
 
+class MinObserved(Step):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'min_observed'
+    
+    def process(self, data):
+        data = super().process(data)
+        #replace missing values with minimum non-null value
+        vals = data.get_data()
+        vals[np.logical_not(np.isfinite(vals))] = np.nanmin(vals)
+        data.set_data(vals)
+        return data
+
 class Perseus(Step):
     def __init__(self, *args):
         super().__init__(*args)
