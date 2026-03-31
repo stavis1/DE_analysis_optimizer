@@ -298,6 +298,19 @@ class KNN(Step):
         data.set_data(vals)
         return data
 
+class MeanImpute(Step):
+    def __init__(self, *args):
+        super().__init__(*args)
+        self.name = 'mean_impute'
+    
+    def process(self, data):
+        data = super().process(data)
+        from sklearn.impute import SimpleImputer
+        vals = data.get_data()
+        vals = SimpleImputer(strategy='mean').fit_transform(vals)
+        data.set_data(vals)
+        return data
+
 # =============================================================================
 # statsitical test choices
 # =============================================================================
