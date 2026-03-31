@@ -294,7 +294,7 @@ class KNN(Step):
         data = super().process(data)
         from sklearn.impute import KNNImputer
         vals = data.get_data()
-        vals = KNNImputer().fit_transform(vals)
+        vals = KNNImputer(keep_empty_features=True).fit_transform(vals.T).T
         data.set_data(vals)
         return data
 
@@ -307,7 +307,7 @@ class MeanImpute(Step):
         data = super().process(data)
         from sklearn.impute import SimpleImputer
         vals = data.get_data()
-        vals = SimpleImputer(strategy='mean').fit_transform(vals)
+        vals = SimpleImputer(strategy='mean', keep_empty_features=True).fit_transform(vals.T).T
         data.set_data(vals)
         return data
 
